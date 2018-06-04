@@ -3,7 +3,7 @@ package com.pregiel.odtwarzacz_pilot.connection;
 import android.os.AsyncTask;
 import android.os.Build;
 
-import com.pregiel.odtwarzacz_pilot.MainActivity;
+import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -49,16 +49,16 @@ public abstract class Connection {
         this.connected = connected;
     }
 
-    public void setStreams(MainActivity activity, InputStream inputStream, OutputStream outputStream) {
+    public void setStreams(PilotView view, InputStream inputStream, OutputStream outputStream) {
         this.DIS = new DataInputStream(inputStream);
         this.DOS = new DataOutputStream(outputStream);
-        getMessage(activity);
-        activity.setConnection(this);
+        getMessage(view);
+        view.setConnection(this);
 
         sendMessage(DEVICE_NAME, Build.MODEL);
     }
 
-    public void getMessage(final MainActivity activity) {
+    public void getMessage(final PilotView view) {
         Thread connect = new Thread(new Runnable() {
             String msg_received = "";
 
@@ -68,8 +68,8 @@ public abstract class Connection {
                 try {
                     msg_received = DIS.readUTF();
                     System.out.println(msg_received);
-                    activity.mediaController(msg_received);
-                    getMessage(activity);
+                    view.mediaController(msg_received);
+                    getMessage(view);
 
 
                 } catch (IOException e) {
@@ -83,7 +83,7 @@ public abstract class Connection {
     }
 
 
-    public abstract void connect(MainActivity activity);
+    public abstract void connect(PilotView view);
 
     public void sendMessage(Object... messages) {
         if (isConnected()) {

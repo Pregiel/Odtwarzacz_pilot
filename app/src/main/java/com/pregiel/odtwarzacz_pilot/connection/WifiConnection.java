@@ -2,10 +2,8 @@ package com.pregiel.odtwarzacz_pilot.connection;
 
 import android.os.AsyncTask;
 
-import com.pregiel.odtwarzacz_pilot.MainActivity;
+import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -14,8 +12,6 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.util.Enumeration;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by Pregiel on 08.04.2018.
@@ -27,7 +23,7 @@ public class WifiConnection extends Connection {
     private final static int PORT = 1755;
     private final static int TIMEOUT = 200;
 
-    private MainActivity activity;
+    private PilotView view;
 
 
     public WifiConnection() {
@@ -39,8 +35,8 @@ public class WifiConnection extends Connection {
 
 
     @Override
-    public void connect(MainActivity activity) {
-        this.activity = activity;
+    public void connect(PilotView view) {
+        this.view = view;
         new LongOperationConnect().execute();
     }
 
@@ -75,7 +71,7 @@ public class WifiConnection extends Connection {
             }
             setConnected(true);
             try {
-                setStreams(activity, socket.getInputStream(), socket.getOutputStream());
+                setStreams(view, socket.getInputStream(), socket.getOutputStream());
             } catch (IOException e) {
                 e.printStackTrace();
             }

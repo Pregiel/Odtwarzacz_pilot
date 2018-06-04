@@ -9,18 +9,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 
-import com.pregiel.odtwarzacz_pilot.MainActivity;
+import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by Pregiel on 08.04.2018.
@@ -120,7 +115,7 @@ public class BTConnection extends Connection {
 
 
     @Override
-    public void connect(MainActivity activity) {
+    public void connect(PilotView view) {
 //        String address = "00:15:83:07:D5:DA";
         if (mBluetoothAdapter.isEnabled()) {
             try {
@@ -137,7 +132,7 @@ public class BTConnection extends Connection {
                 System.out.println("\n...Connection established and data link opened...");
 
                 setConnected(true);
-                setStreams(activity, socket.getInputStream(), socket.getOutputStream());
+                setStreams(view, socket.getInputStream(), socket.getOutputStream());
             } catch (IOException e) {
                 try {
                     socket.close();

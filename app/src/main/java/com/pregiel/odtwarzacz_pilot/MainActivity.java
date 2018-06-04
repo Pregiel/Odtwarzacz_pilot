@@ -1,127 +1,78 @@
 package com.pregiel.odtwarzacz_pilot;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.pm.PackageManager;
+import android.support.design.widget.TabLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.SeekBar;
+import android.view.ViewGroup;
+
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 import com.pregiel.odtwarzacz_pilot.connection.BTConnection;
-import com.pregiel.odtwarzacz_pilot.connection.Connection;
 import com.pregiel.odtwarzacz_pilot.connection.WifiConnection;
-
-import java.time.Duration;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-//    private enum ConnectionType {
-//        NONE, WIFI, BT;
-//    }
+    /**
+     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * fragments for each of the sections. We use a
+     * {@link FragmentPagerAdapter} derivative, which will keep every
+     * loaded fragment in memory. If this becomes too memory intensive, it
+     * may be best to switch to a
+     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+    private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    public Connection connection;
-//    private ConnectionType connectionType = ConnectionType.NONE;
+    /**
+     * The {@link ViewPager} that will host the section contents.
+     */
+    private ViewPager mViewPager;
+    private static PilotView pilotView;
 
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SeekBar timeSlider = findViewById(R.id.timeSlider);
-        timeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-            }
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
-            }
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                connection.sendMessage(Connection.TIME, (((double) seekBar.getProgress()) / 100));
-            }
-        });
+        pilotView = new PilotView();
 
-        SeekBar volumeSlider = findViewById(R.id.volumeSlider);
-        volumeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                if (isMuted) {
-                    connection.sendMessage(Connection.UNMUTE);
-                }
-                connection.sendMessage(Connection.VOLUME, ((double) seekBar.getProgress()) / 100);
-
-            }
-        });
-
-        ImageButton backwardButton = findViewById(R.id.btnBackward);
-        ImageButton forwardButton = findViewById(R.id.btnForward);
-
-        backwardButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        backwardButtonPressed();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        backwardButtonReleased();
-                        break;
-                }
-                return false;
-            }
-        });
-
-        forwardButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        forwardButtonPressed();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        forwardButtonReleased();
-                        break;
-                }
-                return false;
-            }
-        });
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
@@ -132,14 +83,14 @@ public class MainActivity extends AppCompatActivity {
                 WifiConnection wifiConnection = new WifiConnection();
                 if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
                         ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED) {
-                    wifiConnection.connect(this);
+                    wifiConnection.connect(pilotView);
 //                    connectionType = ConnectionType.WIFI;
                 }
                 return true;
             case R.id.btConnect:
                 BTConnection btConnection = new BTConnection();
                 btConnection.searchForDevice(this);
-                btConnection.connect(this);
+                btConnection.connect(pilotView);
 //                connectionType = ConnectionType.BT;
                 return true;
             default:
@@ -147,103 +98,69 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void backward(View v) {
-        connection.sendMessage(Connection.BACKWARD);
-    }
+    /**
+     * A placeholder fragment containing a simple view.
+     */
+    public static class PlaceholderFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
 
-    public void forward(View v) {
-        connection.sendMessage(Connection.FORWARD);
-    }
+        public PlaceholderFragment() {
+        }
 
-    public void play(View v) {
-        connection.sendMessage(Connection.PLAY);
-    }
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static PlaceholderFragment newInstance(int sectionNumber) {
+            PlaceholderFragment fragment = new PlaceholderFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
 
-    public void forwardButtonPressed() {
-        connection.sendMessage(Connection.FORWARD_PRESSED);
-    }
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            int currentTab = getArguments().getInt(ARG_SECTION_NUMBER);
+            View rootView = null;
+            switch (currentTab) {
+                case 1:
+                    rootView = pilotView.makeView(inflater, container);
+                    break;
 
-    public void forwardButtonReleased() {
-        connection.sendMessage(Connection.FORWARD_RELEASED);
-    }
-
-    public void backwardButtonPressed() {
-        connection.sendMessage(Connection.BACKWARD_PRESSED);
-    }
-
-    public void backwardButtonReleased() {
-        connection.sendMessage(Connection.BACKWARD_RELEASED);
-    }
-
-    public void mediaController(String msg) {
-        final String[] message = msg.split(Connection.SEPARATOR);
-
-
-        switch (message[0]) {
-            case Connection.TIME:
-                final TextView timeText = findViewById(R.id.timeView);
-                final SeekBar timeSlider = findViewById(R.id.timeSlider);
-                final double currentTimeMilis = Double.parseDouble(message[1]);
-                final double mediaTimeMilis = Double.parseDouble(message[2]);
-
-                final String newText = milisToString(currentTimeMilis) + "/" + milisToString(mediaTimeMilis);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        timeText.setText(newText);
-                        timeSlider.setProgress((((int) currentTimeMilis * 100) / (int) mediaTimeMilis));
-                    }
-                });
-                break;
-
-            case Connection.VOLUME:
-                final double volumeValue = Double.parseDouble(message[1]) * 100;
-
-                final SeekBar volumeSlider = findViewById(R.id.volumeSlider);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        volumeSlider.setProgress((int) volumeValue);
-                    }
-                });
-                break;
-
-            case Connection.MUTE:
-                isMuted = true;
-                break;
-
-            case Connection.UNMUTE:
-                isMuted = false;
-                break;
-
-            case Connection.DEVICE_NAME:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getApplicationContext(), getString(R.string.connected_with, message[1]), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                break;
-
-            case Connection.PLAYLIST_SEND:
-                System.out.println(msg);
-                break;
+                case 2:
+                    break;
+            }
+            return rootView;
         }
     }
 
-    private boolean isMuted = false;
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the sections/tabs/pages.
+     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-    private String milisToString(double milis) {
-        int seconds = (int) (milis / 1000) % 60;
-        int minutes = (int) ((milis / (1000 * 60)) % 60);
-        int hours = (int) ((milis / (1000 * 60 * 60)) % 24);
-
-        if (hours == 0) {
-            return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
         }
-        return String.format(Locale.getDefault(), "%01d:%02d:%02d", hours, minutes, seconds);
-    }
 
+        @Override
+        public Fragment getItem(int position) {
+            // getItem is called to instantiate the fragment for the given page.
+            // Return a PlaceholderFragment (defined as a static inner class below).
+            return PlaceholderFragment.newInstance(position + 1);
+        }
+
+        @Override
+        public int getCount() {
+            // Show 3 total pages.
+            return 2;
+        }
+    }
 }
