@@ -43,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
     private static PilotView pilotView;
     private static PlaylistView playlistView;
 
+    public static PilotView getPilotView() {
+        return pilotView;
+    }
+
     public static PlaylistView getPlaylistView() {
         return playlistView;
     }
@@ -91,18 +95,14 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.wifiConnect:
-                WifiConnection wifiConnection = new WifiConnection();
                 if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
                         ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED) {
-                    wifiConnection.connect(pilotView);
-//                    connectionType = ConnectionType.WIFI;
+                    WifiConnection.connect();
                 }
                 return true;
             case R.id.btConnect:
-                BTConnection btConnection = new BTConnection();
-                btConnection.searchForDevice(this);
-                btConnection.connect(pilotView);
-//                connectionType = ConnectionType.BT;
+                BTConnection.searchForDevice(this);
+                BTConnection.connect();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

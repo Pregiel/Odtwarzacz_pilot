@@ -43,34 +43,32 @@ public abstract class Connection {
 
     public static final String SEPARATOR = "::";
 
-    private DataInputStream DIS;
-    private DataOutputStream DOS;
+    private static DataInputStream DIS;
+    private static DataOutputStream DOS;
 
 
-    private boolean connected = false;
-
-    private PilotView pilotView;
+    private static boolean connected = false;
 
 
-    public boolean isConnected() {
+
+    public static boolean isConnected() {
         return connected;
     }
 
-    public void setConnected(boolean connected) {
-        this.connected = connected;
+    public static void setConnected(boolean connected) {
+        Connection.connected = connected;
     }
 
-    public void setStreams(PilotView view, InputStream inputStream, OutputStream outputStream) {
-        this.DIS = new DataInputStream(inputStream);
-        this.DOS = new DataOutputStream(outputStream);
+    public static void setStreams(InputStream inputStream, OutputStream outputStream) {
+        DIS = new DataInputStream(inputStream);
+        DOS = new DataOutputStream(outputStream);
         getMessage();
-        view.setConnection(this);
+//        view.setConnection();
 
-        pilotView = view;
         sendMessage(DEVICE_NAME, Build.MODEL);
     }
 
-    public void getMessage() {
+    private static void getMessage() {
         Thread connect = new Thread(new Runnable() {
             String msg_received = "";
 
@@ -95,9 +93,13 @@ public abstract class Connection {
     }
 
 
-    public abstract void connect(PilotView view);
+//    public static void connect(PilotView view) {
+//
+//    }
 
-    public void sendMessage(Object... messages) {
+
+
+    public static void sendMessage(Object... messages) {
         if (isConnected()) {
             StringBuilder stringBuilder = new StringBuilder();
             for (Object o : messages) {
@@ -107,7 +109,7 @@ public abstract class Connection {
         }
     }
 
-    private class LongOperationSendMessage extends AsyncTask<String, Void, Void> {
+    private static class LongOperationSendMessage extends AsyncTask<String, Void, Void> {
 
 
         @Override
@@ -123,20 +125,20 @@ public abstract class Connection {
         }
     }
 
-    public void mediaController(String msg) {
+    public static void mediaController(String msg) {
         final String[] message = msg.split(Connection.SEPARATOR);
 
 
         switch (message[0]) {
             case TIME:
-                final TextView timeText = pilotView.getView().findViewById(R.id.timeView);
-                final SeekBar timeSlider = pilotView.getView().findViewById(R.id.timeSlider);
+                final TextView timeText = MainActivity.getPilotView().getView().findViewById(R.id.timeView);
+                final SeekBar timeSlider = MainActivity.getPilotView().getView().findViewById(R.id.timeSlider);
                 final double currentTimeMilis = Double.parseDouble(message[1]);
                 final double mediaTimeMilis = Double.parseDouble(message[2]);
 
                 final String newText = Utils.milisToString(currentTimeMilis) + "/" + Utils.milisToString(mediaTimeMilis);
 
-                ((Activity) pilotView.getView().getContext()).runOnUiThread(new Runnable() {
+                ((Activity) MainActivity.getPilotView().getView().getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         timeText.setText(newText);
@@ -148,9 +150,9 @@ public abstract class Connection {
             case VOLUME:
                 final double volumeValue = Double.parseDouble(message[1]) * 100;
 
-                final SeekBar volumeSlider = pilotView.getView().findViewById(R.id.volumeSlider);
+                final SeekBar volumeSlider = MainActivity.getPilotView().getView().findViewById(R.id.volumeSlider);
 
-                ((Activity) pilotView.getView().getContext()).runOnUiThread(new Runnable() {
+                ((Activity) MainActivity.getPilotView().getView().getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         volumeSlider.setProgress((int) volumeValue);
@@ -159,18 +161,18 @@ public abstract class Connection {
                 break;
 
             case MUTE:
-                pilotView.setMuted(true);
+                MainActivity.getPilotView().setMuted(true);
                 break;
 
             case UNMUTE:
-                pilotView.setMuted(false);
+                MainActivity.getPilotView().setMuted(false);
                 break;
 
             case DEVICE_NAME:
-                ((Activity) pilotView.getView().getContext()).runOnUiThread(new Runnable() {
+                ((Activity) MainActivity.getPilotView().getView().getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(pilotView.getView().getContext(), pilotView.getView().getContext().getString(R.string.connected_with, message[1]), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.getPilotView().getView().getContext(), MainActivity.getPilotView().getView().getContext().getString(R.string.connected_with, message[1]), Toast.LENGTH_SHORT).show();
                     }
                 });
                 break;
@@ -183,7 +185,6 @@ public abstract class Connection {
             case PLAYLIST_PLAYING_INDEX:
                 MainActivity.getPlaylist().setPlaylistIndex(Integer.parseInt(message[1]));
                 MainActivity.getPlaylistView().updateListView();
-
                 break;
         }
     }

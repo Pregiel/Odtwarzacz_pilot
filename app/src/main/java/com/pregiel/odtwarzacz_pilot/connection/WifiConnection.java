@@ -2,6 +2,7 @@ package com.pregiel.odtwarzacz_pilot.connection;
 
 import android.os.AsyncTask;
 
+import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 
 import java.io.IOException;
@@ -18,25 +19,21 @@ import java.util.Enumeration;
  */
 
 public class WifiConnection extends Connection {
-    private Socket socket;
+    private static Socket socket;
 
     private final static int PORT = 1755;
     private final static int TIMEOUT = 200;
 
-    private PilotView view;
 
 
     public WifiConnection() {
-        this.socket = null;
+        socket = null;
     }
 
     //main functions
 
 
-
-    @Override
-    public void connect(PilotView view) {
-        this.view = view;
+    public static void connect() {
         new LongOperationConnect().execute();
     }
 
@@ -46,7 +43,7 @@ public class WifiConnection extends Connection {
 
     //connection
 
-    private class LongOperationConnect extends AsyncTask<Void, Void, Void> {
+    private static class LongOperationConnect extends AsyncTask<Void, Void, Void> {
 
 
         @Override
@@ -71,7 +68,7 @@ public class WifiConnection extends Connection {
             }
             setConnected(true);
             try {
-                setStreams(view, socket.getInputStream(), socket.getOutputStream());
+                setStreams(socket.getInputStream(), socket.getOutputStream());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -91,7 +88,7 @@ public class WifiConnection extends Connection {
         }
     }
 
-    private String getWifiApIpAddress() {
+    private static String getWifiApIpAddress() {
 
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en

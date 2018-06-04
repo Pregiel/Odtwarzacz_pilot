@@ -46,8 +46,8 @@ public class PlaylistListViewAdapter extends ArrayAdapter<String> {
         nameText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (PilotView.getConnection().isConnected()) {
-                    PilotView.getConnection().sendMessage(Connection.PLAYLIST_PLAY, position);
+                if (Connection.isConnected()) {
+                    Connection.sendMessage(Connection.PLAYLIST_PLAY, position);
                 }
             }
         });

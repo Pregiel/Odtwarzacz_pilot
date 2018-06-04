@@ -12,7 +12,7 @@ import com.pregiel.odtwarzacz_pilot.R;
 import com.pregiel.odtwarzacz_pilot.connection.Connection;
 
 public class PilotView {
-    private static Connection connection;
+//    private static Connection connection;
 
     private boolean muted = false;
 
@@ -22,13 +22,13 @@ public class PilotView {
         return view;
     }
 
-    public void setConnection(Connection connection) {
-        PilotView.connection = connection;
-    }
-
-    public static Connection getConnection() {
-        return connection;
-    }
+//    public void setConnection(Connection connection) {
+//        PilotView.connection = connection;
+//    }
+//
+//    public static Connection getConnection() {
+//        return connection;
+//    }
 
     public View makeView(LayoutInflater inflater, ViewGroup container) {
         view = inflater.inflate(R.layout.view_pilot, container, false);
@@ -48,9 +48,9 @@ public class PilotView {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (connection != null) {
-                    connection.sendMessage(Connection.TIME, (((double) seekBar.getProgress()) / 100));
-                }
+//                if (connection != null) {
+                Connection.sendMessage(Connection.TIME, (((double) seekBar.getProgress()) / 100));
+//                }
             }
         });
 
@@ -68,11 +68,11 @@ public class PilotView {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (connection != null) {
-                    if (isMuted()) {
-                        connection.sendMessage(Connection.UNMUTE);
-                    }
-                    connection.sendMessage(Connection.VOLUME, ((double) seekBar.getProgress()) / 100);
+//                if (connection != null) {
+                if (isMuted()) {
+                    Connection.sendMessage(Connection.UNMUTE);
+//                    }
+                    Connection.sendMessage(Connection.VOLUME, ((double) seekBar.getProgress()) / 100);
                 }
             }
         });
@@ -122,33 +122,33 @@ public class PilotView {
     }
 
     public void play() {
-        if (connection != null) {
-            connection.sendMessage(Connection.PLAY);
-        }
+//        if (connection != null) {
+        Connection.sendMessage(Connection.PLAY);
+//        }
     }
 
     public void forwardButtonPressed() {
-        if (connection != null) {
-            connection.sendMessage(Connection.FORWARD_PRESSED);
-        }
+//        if (connection != null) {
+        Connection.sendMessage(Connection.FORWARD_PRESSED);
+//        }
     }
 
     public void forwardButtonReleased() {
-        if (connection != null) {
-            connection.sendMessage(Connection.FORWARD_RELEASED);
-        }
+//        if (connection != null) {
+        Connection.sendMessage(Connection.FORWARD_RELEASED);
+//        }
     }
 
     public void backwardButtonPressed() {
-        if (connection != null) {
-            connection.sendMessage(Connection.BACKWARD_PRESSED);
-        }
+//        if (connection != null) {
+        Connection.sendMessage(Connection.BACKWARD_PRESSED);
+//        }
     }
 
     public void backwardButtonReleased() {
-        if (connection != null) {
-            connection.sendMessage(Connection.BACKWARD_RELEASED);
-        }
+//        if (connection != null) {
+        Connection.sendMessage(Connection.BACKWARD_RELEASED);
+//        }
     }
 
 

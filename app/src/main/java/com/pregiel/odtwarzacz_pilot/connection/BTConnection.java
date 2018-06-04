@@ -27,18 +27,18 @@ public class BTConnection extends Connection {
     private final static UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private final static int REQUEST_ENABLE_BT = 1;
 
-    private BluetoothDevice dev;
-    private BluetoothSocket socket;
+    private static BluetoothDevice dev;
+    private static BluetoothSocket socket;
 
-    private BluetoothAdapter mBluetoothAdapter;
-    private SingBroadcastReceiver mReceiver;
+    private static BluetoothAdapter mBluetoothAdapter;
+    private static SingBroadcastReceiver mReceiver;
 
     public BTConnection() {
 
     }
 
     //search device
-    public void searchForDevice(Activity activity) {
+    public static void searchForDevice(Activity activity) {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             System.out.println("Device doesn't support Bluetooth");
@@ -90,7 +90,7 @@ public class BTConnection extends Connection {
         }
     }
 
-    private class SingBroadcastReceiver extends BroadcastReceiver {
+    private static class SingBroadcastReceiver extends BroadcastReceiver {
 
         private BluetoothDevice device;
 
@@ -114,8 +114,7 @@ public class BTConnection extends Connection {
     //connect
 
 
-    @Override
-    public void connect(PilotView view) {
+    public static void connect() {
 //        String address = "00:15:83:07:D5:DA";
         if (mBluetoothAdapter.isEnabled()) {
             try {
@@ -132,7 +131,7 @@ public class BTConnection extends Connection {
                 System.out.println("\n...Connection established and data link opened...");
 
                 setConnected(true);
-                setStreams(view, socket.getInputStream(), socket.getOutputStream());
+                setStreams( socket.getInputStream(), socket.getOutputStream());
             } catch (IOException e) {
                 try {
                     socket.close();
