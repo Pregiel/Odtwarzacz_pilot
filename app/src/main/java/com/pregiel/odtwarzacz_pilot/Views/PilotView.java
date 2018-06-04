@@ -16,12 +16,11 @@ import com.pregiel.odtwarzacz_pilot.connection.Connection;
 
 import java.util.Locale;
 
-public class PilotView{
+public class PilotView {
     private static Connection connection;
 
 
     private View rootView;
-
 
 
     public void setConnection(Connection connection) {
@@ -46,7 +45,9 @@ public class PilotView{
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                connection.sendMessage(Connection.TIME, (((double) seekBar.getProgress()) / 100));
+                if (connection != null) {
+                    connection.sendMessage(Connection.TIME, (((double) seekBar.getProgress()) / 100));
+                }
             }
         });
 
@@ -64,11 +65,12 @@ public class PilotView{
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if (isMuted) {
-                    connection.sendMessage(Connection.UNMUTE);
+                if (connection != null) {
+                    if (isMuted) {
+                        connection.sendMessage(Connection.UNMUTE);
+                    }
+                    connection.sendMessage(Connection.VOLUME, ((double) seekBar.getProgress()) / 100);
                 }
-                connection.sendMessage(Connection.VOLUME, ((double) seekBar.getProgress()) / 100);
-
             }
         });
 
@@ -117,23 +119,33 @@ public class PilotView{
     }
 
     public void play() {
-        connection.sendMessage(Connection.PLAY);
+        if (connection != null) {
+            connection.sendMessage(Connection.PLAY);
+        }
     }
 
-    public static void forwardButtonPressed() {
-        connection.sendMessage(Connection.FORWARD_PRESSED);
+    public void forwardButtonPressed() {
+        if (connection != null) {
+            connection.sendMessage(Connection.FORWARD_PRESSED);
+        }
     }
 
-    public static void forwardButtonReleased() {
-        connection.sendMessage(Connection.FORWARD_RELEASED);
+    public void forwardButtonReleased() {
+        if (connection != null) {
+            connection.sendMessage(Connection.FORWARD_RELEASED);
+        }
     }
 
-    public static void backwardButtonPressed() {
-        connection.sendMessage(Connection.BACKWARD_PRESSED);
+    public void backwardButtonPressed() {
+        if (connection != null) {
+            connection.sendMessage(Connection.BACKWARD_PRESSED);
+        }
     }
 
-    public static void backwardButtonReleased() {
-        connection.sendMessage(Connection.BACKWARD_RELEASED);
+    public void backwardButtonReleased() {
+        if (connection != null) {
+            connection.sendMessage(Connection.BACKWARD_RELEASED);
+        }
     }
 
     public void mediaController(String msg) {
@@ -149,7 +161,7 @@ public class PilotView{
 
                 final String newText = milisToString(currentTimeMilis) + "/" + milisToString(mediaTimeMilis);
 
-                ((Activity)rootView.getContext()).runOnUiThread(new Runnable() {
+                ((Activity) rootView.getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         timeText.setText(newText);
@@ -163,7 +175,7 @@ public class PilotView{
 
                 final SeekBar volumeSlider = rootView.findViewById(R.id.volumeSlider);
 
-                ((Activity)rootView.getContext()).runOnUiThread(new Runnable() {
+                ((Activity) rootView.getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         volumeSlider.setProgress((int) volumeValue);
@@ -180,7 +192,7 @@ public class PilotView{
                 break;
 
             case Connection.DEVICE_NAME:
-                ((Activity)rootView.getContext()).runOnUiThread(new Runnable() {
+                ((Activity) rootView.getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(rootView.getContext(), rootView.getContext().getString(R.string.connected_with, message[1]), Toast.LENGTH_SHORT).show();
