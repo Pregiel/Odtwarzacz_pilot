@@ -1,8 +1,14 @@
 package com.pregiel.odtwarzacz_pilot.connection;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.pregiel.odtwarzacz_pilot.R;
+import com.pregiel.odtwarzacz_pilot.Utils;
 import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 
 import java.io.DataInputStream;
@@ -40,6 +46,8 @@ public abstract class Connection {
 
     private boolean connected = false;
 
+    private PilotView pilotView;
+
 
     public boolean isConnected() {
         return connected;
@@ -52,13 +60,14 @@ public abstract class Connection {
     public void setStreams(PilotView view, InputStream inputStream, OutputStream outputStream) {
         this.DIS = new DataInputStream(inputStream);
         this.DOS = new DataOutputStream(outputStream);
-        getMessage(view);
+        getMessage();
         view.setConnection(this);
 
+        pilotView = view;
         sendMessage(DEVICE_NAME, Build.MODEL);
     }
 
-    public void getMessage(final PilotView view) {
+    public void getMessage() {
         Thread connect = new Thread(new Runnable() {
             String msg_received = "";
 
@@ -68,8 +77,8 @@ public abstract class Connection {
                 try {
                     msg_received = DIS.readUTF();
                     System.out.println(msg_received);
-                    view.mediaController(msg_received);
-                    getMessage(view);
+                    mediaController(msg_received);
+                    getMessage();
 
 
                 } catch (IOException e) {
@@ -108,6 +117,64 @@ public abstract class Connection {
                 e.printStackTrace();
             }
             return null;
+        }
+    }
+
+    public void mediaController(String msg) {
+        final String[] message = msg.split(Connection.SEPARATOR);
+
+
+        switch (message[0]) {
+            case Connection.TIME:
+                final TextView timeText = pilotView.getView().findViewById(R.id.timeView);
+                final SeekBar timeSlider = pilotView.getView().findViewById(R.id.timeSlider);
+                final double currentTimeMilis = Double.parseDouble(message[1]);
+                final double mediaTimeMilis = Double.parseDouble(message[2]);
+
+                final String newText = Utils.milisToString(currentTimeMilis) + "/" + Utils.milisToString(mediaTimeMilis);
+
+                ((Activity) pilotView.getView().getContext()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        timeText.setText(newText);
+                        timeSlider.setProgress((((int) currentTimeMilis * 100) / (int) mediaTimeMilis));
+                    }
+                });
+                break;
+
+            case Connection.VOLUME:
+                final double volumeValue = Double.parseDouble(message[1]) * 100;
+
+                final SeekBar volumeSlider = pilotView.getView().findViewById(R.id.volumeSlider);
+
+                ((Activity) pilotView.getView().getContext()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        volumeSlider.setProgress((int) volumeValue);
+                    }
+                });
+                break;
+
+            case Connection.MUTE:
+                pilotView.setMuted(true);
+                break;
+
+            case Connection.UNMUTE:
+                pilotView.setMuted(false);
+                break;
+
+            case Connection.DEVICE_NAME:
+                ((Activity) pilotView.getView().getContext()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(pilotView.getView().getContext(), pilotView.getView().getContext().getString(R.string.connected_with, message[1]), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                break;
+
+            case Connection.PLAYLIST_SEND:
+
+                break;
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.pregiel.odtwarzacz_pilot.Views;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -19,9 +20,13 @@ import java.util.Locale;
 public class PilotView {
     private static Connection connection;
 
+    private boolean muted = false;
 
     private View rootView;
 
+    public View getView() {
+        return rootView;
+    }
 
     public void setConnection(Connection connection) {
         PilotView.connection = connection;
@@ -66,7 +71,7 @@ public class PilotView {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if (connection != null) {
-                    if (isMuted) {
+                    if (isMuted()) {
                         connection.sendMessage(Connection.UNMUTE);
                     }
                     connection.sendMessage(Connection.VOLUME, ((double) seekBar.getProgress()) / 100);
@@ -148,75 +153,15 @@ public class PilotView {
         }
     }
 
-    public void mediaController(String msg) {
-        final String[] message = msg.split(Connection.SEPARATOR);
 
-
-        switch (message[0]) {
-            case Connection.TIME:
-                final TextView timeText = rootView.findViewById(R.id.timeView);
-                final SeekBar timeSlider = rootView.findViewById(R.id.timeSlider);
-                final double currentTimeMilis = Double.parseDouble(message[1]);
-                final double mediaTimeMilis = Double.parseDouble(message[2]);
-
-                final String newText = milisToString(currentTimeMilis) + "/" + milisToString(mediaTimeMilis);
-
-                ((Activity) rootView.getContext()).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        timeText.setText(newText);
-                        timeSlider.setProgress((((int) currentTimeMilis * 100) / (int) mediaTimeMilis));
-                    }
-                });
-                break;
-
-            case Connection.VOLUME:
-                final double volumeValue = Double.parseDouble(message[1]) * 100;
-
-                final SeekBar volumeSlider = rootView.findViewById(R.id.volumeSlider);
-
-                ((Activity) rootView.getContext()).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        volumeSlider.setProgress((int) volumeValue);
-                    }
-                });
-                break;
-
-            case Connection.MUTE:
-                isMuted = true;
-                break;
-
-            case Connection.UNMUTE:
-                isMuted = false;
-                break;
-
-            case Connection.DEVICE_NAME:
-                ((Activity) rootView.getContext()).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(rootView.getContext(), rootView.getContext().getString(R.string.connected_with, message[1]), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                break;
-
-            case Connection.PLAYLIST_SEND:
-
-                break;
-        }
+    public boolean isMuted() {
+        return muted;
     }
 
-    private boolean isMuted = false;
-
-    private String milisToString(double milis) {
-        int seconds = (int) (milis / 1000) % 60;
-        int minutes = (int) ((milis / (1000 * 60)) % 60);
-        int hours = (int) ((milis / (1000 * 60 * 60)) % 24);
-
-        if (hours == 0) {
-            return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
-        }
-        return String.format(Locale.getDefault(), "%01d:%02d:%02d", hours, minutes, seconds);
+    public void setMuted(boolean muted) {
+        this.muted = muted;
     }
+
+
 }
 
