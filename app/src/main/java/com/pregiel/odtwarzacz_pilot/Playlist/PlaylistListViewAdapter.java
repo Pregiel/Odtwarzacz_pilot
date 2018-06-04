@@ -31,16 +31,24 @@ public class PlaylistListViewAdapter extends ArrayAdapter<String> {
         convertView = LayoutInflater.from(getContext()).inflate(R.layout.element_playlist, parent, false);
 
 
+
         TextView nameText = convertView.findViewById(R.id.nameText);
 
         String[] name = MainActivity.getPlaylist().getPlaylist().get(position).split("\\\\");
 
         nameText.setText(name[name.length - 1]);
 
+
+        if (MainActivity.getPlaylist().getPlaylistIndex() == position + 1) {
+            nameText.setTextColor(getContext().getResources().getColor(R.color.colorAccent));
+        }
+
         nameText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PilotView.getConnection().sendMessage(Connection.PLAYLIST_PLAY, position);
+                if (PilotView.getConnection().isConnected()) {
+                    PilotView.getConnection().sendMessage(Connection.PLAYLIST_PLAY, position);
+                }
             }
         });
 

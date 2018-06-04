@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Playlist {
     private List<String> playlist;
+    private int playlistIndex;
 
     public Playlist() {
         this.playlist = new ArrayList<>();
@@ -20,5 +21,13 @@ public class Playlist {
 
     public List<String> getPlaylist() {
         return playlist;
+    }
+
+    public int getPlaylistIndex() {
+        return playlistIndex;
+    }
+
+    public void setPlaylistIndex(int playlistIndex) {
+        this.playlistIndex = playlistIndex;
     }
 }

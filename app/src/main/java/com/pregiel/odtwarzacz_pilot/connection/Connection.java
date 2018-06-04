@@ -35,6 +35,7 @@ public abstract class Connection {
     public static final String PLAYLIST_SEND = "PLAYLIST_SEND";
     public static final String PLAYLIST_UPDATE = "PLAYLIST_UPDATE";
     public static final String PLAYLIST_PLAY = "PLAYLIST_PLAY";
+    public static final String PLAYLIST_PLAYING_INDEX = "PLAYLIST_PLAYING_INDEX";
     public static final String FORWARD_PRESSED = "FORWARD_PRESSED";
     public static final String FORWARD_RELEASED = "FORWARD_RELEASED";
     public static final String BACKWARD_PRESSED = "BACKWARD_PRESSED";
@@ -127,7 +128,7 @@ public abstract class Connection {
 
 
         switch (message[0]) {
-            case Connection.TIME:
+            case TIME:
                 final TextView timeText = pilotView.getView().findViewById(R.id.timeView);
                 final SeekBar timeSlider = pilotView.getView().findViewById(R.id.timeSlider);
                 final double currentTimeMilis = Double.parseDouble(message[1]);
@@ -144,7 +145,7 @@ public abstract class Connection {
                 });
                 break;
 
-            case Connection.VOLUME:
+            case VOLUME:
                 final double volumeValue = Double.parseDouble(message[1]) * 100;
 
                 final SeekBar volumeSlider = pilotView.getView().findViewById(R.id.volumeSlider);
@@ -157,15 +158,15 @@ public abstract class Connection {
                 });
                 break;
 
-            case Connection.MUTE:
+            case MUTE:
                 pilotView.setMuted(true);
                 break;
 
-            case Connection.UNMUTE:
+            case UNMUTE:
                 pilotView.setMuted(false);
                 break;
 
-            case Connection.DEVICE_NAME:
+            case DEVICE_NAME:
                 ((Activity) pilotView.getView().getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -174,9 +175,15 @@ public abstract class Connection {
                 });
                 break;
 
-            case Connection.PLAYLIST_SEND:
+            case PLAYLIST_SEND:
                 MainActivity.getPlaylist().makePlaylist(message);
                 MainActivity.getPlaylistView().updateListView();
+                break;
+
+            case PLAYLIST_PLAYING_INDEX:
+                MainActivity.getPlaylist().setPlaylistIndex(Integer.parseInt(message[1]));
+                MainActivity.getPlaylistView().updateListView();
+
                 break;
         }
     }
