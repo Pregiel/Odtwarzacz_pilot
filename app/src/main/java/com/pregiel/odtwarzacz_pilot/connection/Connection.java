@@ -27,6 +27,10 @@ public abstract class Connection {
     public static final String DEVICE_NAME = "DEVICE_NAME";
     public static final String PLAYLIST_SEND = "PLAYLIST_SEND";
     public static final String PLAYLIST_UPDATE = "PLAYLIST_UPDATE";
+    public static final String FORWARD_PRESSED = "FORWARD_PRESSED";
+    public static final String FORWARD_RELEASED = "FORWARD_RELEASED";
+    public static final String BACKWARD_PRESSED = "BACKWARD_PRESSED";
+    public static final String BACKWARD_RELEASED = "BACKWARD_RELEASED";
 
     public static final String SEPARATOR = "::";
 
@@ -82,12 +86,13 @@ public abstract class Connection {
     public abstract void connect(MainActivity activity);
 
     public void sendMessage(Object... messages) {
-         StringBuilder stringBuilder = new StringBuilder();
-        for (Object o : messages) {
-            stringBuilder.append(o).append(SEPARATOR);
+        if (isConnected()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Object o : messages) {
+                stringBuilder.append(o).append(SEPARATOR);
+            }
+            new LongOperationSendMessage().execute(stringBuilder.toString());
         }
-
-        new LongOperationSendMessage().execute(stringBuilder.toString());
     }
 
     private class LongOperationSendMessage extends AsyncTask<String, Void, Void> {
