@@ -108,15 +108,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.wifiConnect:
-//                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
-//                        ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED) {
-//                    WifiConnection.connect();
-//                }
-                return true;
-            case R.id.btConnect:
-                BTConnection.searchForDevice(this);
-                BTConnection.connect();
+            case R.id.settings:
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
