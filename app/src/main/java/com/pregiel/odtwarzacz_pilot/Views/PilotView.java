@@ -1,42 +1,40 @@
 package com.pregiel.odtwarzacz_pilot.Views;
 
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.pregiel.odtwarzacz_pilot.R;
 import com.pregiel.odtwarzacz_pilot.connection.Connection;
-
-import java.util.Locale;
 
 public class PilotView {
     private static Connection connection;
 
     private boolean muted = false;
 
-    private View rootView;
+    private View view;
 
     public View getView() {
-        return rootView;
+        return view;
     }
 
     public void setConnection(Connection connection) {
         PilotView.connection = connection;
     }
 
-    public View makeView(LayoutInflater inflater, ViewGroup container) {
-        rootView = inflater.inflate(R.layout.view_pilot, container, false);
+    public static Connection getConnection() {
+        return connection;
+    }
 
-        SeekBar timeSlider = rootView.findViewById(R.id.timeSlider);
-//        PilotView.rootView = rootView;
+    public View makeView(LayoutInflater inflater, ViewGroup container) {
+        view = inflater.inflate(R.layout.view_pilot, container, false);
+
+        SeekBar timeSlider = view.findViewById(R.id.timeSlider);
+//        PilotView.view = view;
         timeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -56,7 +54,7 @@ public class PilotView {
             }
         });
 
-        SeekBar volumeSlider = rootView.findViewById(R.id.volumeSlider);
+        SeekBar volumeSlider = view.findViewById(R.id.volumeSlider);
         volumeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -79,9 +77,9 @@ public class PilotView {
             }
         });
 
-        ImageButton backwardButton = rootView.findViewById(R.id.btnBackward);
-        ImageButton forwardButton = rootView.findViewById(R.id.btnForward);
-        ImageButton playButton = rootView.findViewById(R.id.btnPlay);
+        ImageButton backwardButton = view.findViewById(R.id.btnBackward);
+        ImageButton forwardButton = view.findViewById(R.id.btnForward);
+        ImageButton playButton = view.findViewById(R.id.btnPlay);
 
         backwardButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -120,7 +118,7 @@ public class PilotView {
             }
         });
 
-        return rootView;
+        return view;
     }
 
     public void play() {

@@ -7,6 +7,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.R;
 import com.pregiel.odtwarzacz_pilot.Utils;
 import com.pregiel.odtwarzacz_pilot.Views.PilotView;
@@ -33,6 +34,7 @@ public abstract class Connection {
     public static final String DEVICE_NAME = "DEVICE_NAME";
     public static final String PLAYLIST_SEND = "PLAYLIST_SEND";
     public static final String PLAYLIST_UPDATE = "PLAYLIST_UPDATE";
+    public static final String PLAYLIST_PLAY = "PLAYLIST_PLAY";
     public static final String FORWARD_PRESSED = "FORWARD_PRESSED";
     public static final String FORWARD_RELEASED = "FORWARD_RELEASED";
     public static final String BACKWARD_PRESSED = "BACKWARD_PRESSED";
@@ -173,7 +175,8 @@ public abstract class Connection {
                 break;
 
             case Connection.PLAYLIST_SEND:
-
+                MainActivity.getPlaylist().makePlaylist(message);
+                MainActivity.getPlaylistView().updateListView();
                 break;
         }
     }

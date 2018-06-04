@@ -3,8 +3,6 @@ package com.pregiel.odtwarzacz_pilot;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,9 +18,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.TextView;
-
+import com.pregiel.odtwarzacz_pilot.Playlist.Playlist;
 import com.pregiel.odtwarzacz_pilot.Views.PilotView;
+import com.pregiel.odtwarzacz_pilot.Views.PlaylistView;
 import com.pregiel.odtwarzacz_pilot.connection.BTConnection;
 import com.pregiel.odtwarzacz_pilot.connection.WifiConnection;
 
@@ -43,6 +41,17 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
     private static PilotView pilotView;
+    private static PlaylistView playlistView;
+
+    public static PlaylistView getPlaylistView() {
+        return playlistView;
+    }
+
+    private static Playlist playlist;
+
+    public static Playlist getPlaylist() {
+        return playlist;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +74,9 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
         pilotView = new PilotView();
+        playlistView = new PlaylistView();
 
+        playlist = new Playlist();
     }
 
 
@@ -134,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case 2:
+                    rootView = playlistView.makeView(inflater, container);
                     break;
             }
             return rootView;
