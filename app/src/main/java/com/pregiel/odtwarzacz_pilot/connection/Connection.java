@@ -1,8 +1,17 @@
 package com.pregiel.odtwarzacz_pilot.connection;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +26,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketException;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 /**
  * Created by Pregiel on 09.04.2018.
@@ -50,7 +62,6 @@ public abstract class Connection {
     private static boolean connected = false;
 
 
-
     public static boolean isConnected() {
         return connected;
     }
@@ -63,6 +74,12 @@ public abstract class Connection {
         DIS = new DataInputStream(inputStream);
         DOS = new DataOutputStream(outputStream);
         getMessage();
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                popupWindow.dismiss();
+            }
+        });
 //        view.setConnection();
 
         sendMessage(DEVICE_NAME, Build.MODEL);
@@ -82,6 +99,9 @@ public abstract class Connection {
                     getMessage();
 
 
+                } catch (SocketException e) {
+                    disconnect();
+                    Connection.showConnectionChooser();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -93,10 +113,19 @@ public abstract class Connection {
     }
 
 
+    private static void disconnect() {
+        setConnected(false);
+        try {
+            DOS.close();
+            DIS.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 //    public static void connect(PilotView view) {
 //
 //    }
-
 
 
     public static void sendMessage(Object... messages) {
@@ -187,5 +216,45 @@ public abstract class Connection {
                 MainActivity.getPlaylistView().updateListView();
                 break;
         }
+    }
+
+
+    private static PopupWindow popupWindow;
+
+    public static void showConnectionChooser() {
+        LayoutInflater inflater = (LayoutInflater) MainActivity.getInstance().getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        final View popupView = inflater.inflate(R.layout.view_choose_connection, null);
+
+        popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+        Button wifiButton = popupView.findViewById(R.id.btnWifi);
+
+        wifiButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED) {
+                    WifiConnection.connect();
+                }
+            }
+        });
+
+        Button btButton = popupView.findViewById(R.id.btnBt);
+
+        btButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BTConnection.searchForDevice(MainActivity.getInstance());
+                BTConnection.connect();
+            }
+        });
+
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+            }
+        });
     }
 }

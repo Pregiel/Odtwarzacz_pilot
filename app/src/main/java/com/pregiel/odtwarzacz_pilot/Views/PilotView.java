@@ -33,6 +33,8 @@ public class PilotView {
     public View makeView(LayoutInflater inflater, ViewGroup container) {
         view = inflater.inflate(R.layout.view_pilot, container, false);
 
+        Connection.showConnectionChooser();
+
         SeekBar timeSlider = view.findViewById(R.id.timeSlider);
 //        PilotView.view = view;
         timeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
