@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Odtwarzacz - pilot</string>
+    <string name="connect">Connect</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="wifi">Wifi</string>
+    <string name="connected_with">Connected with %1$s</string>
+</resources>
