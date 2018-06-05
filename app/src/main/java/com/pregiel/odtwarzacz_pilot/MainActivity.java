@@ -23,13 +23,20 @@ import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
+import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooser;
 import com.pregiel.odtwarzacz_pilot.Playlist.Playlist;
 import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 import com.pregiel.odtwarzacz_pilot.Views.PlaylistView;
 import com.pregiel.odtwarzacz_pilot.connection.BTConnection;
 import com.pregiel.odtwarzacz_pilot.connection.WifiConnection;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
+
+    public static final String[] SUPPORTED_AUDIO = {"MP3"};//{"*.AIFF", "*.MP3", "*.WAV"};
+    public static final String[] SUPPORTED_VIDEO = {"MP4"};//{"*.FLV", "*.MP4"};
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -109,7 +116,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.settings:
-
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

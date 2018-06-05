@@ -16,6 +16,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooser;
+import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooserItem;
 import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.R;
 import com.pregiel.odtwarzacz_pilot.Utils;
@@ -28,6 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
@@ -53,6 +57,11 @@ public abstract class Connection {
     public static final String FORWARD_RELEASED = "FORWARD_RELEASED";
     public static final String BACKWARD_PRESSED = "BACKWARD_PRESSED";
     public static final String BACKWARD_RELEASED = "BACKWARD_RELEASED";
+    public static final String FILECHOOSER_DIRECTORY_TREE = "FILECHOOSER_DIRECTORY_TREE";
+    public static final String FILECHOOSER_SHOW = "FILECHOOSER_SHOW";
+    public static final String FILECHOOSER_DRIVE_LIST = "FILECHOOSER_DRIVE_LIST";
+    public static final String FILECHOOSER_PLAY = "FILECHOOSER_PLAY";
+    public static final String FILECHOOSER_PLAYLIST_ADD = "FILECHOOSER_PLAYLIST_ADD";
 
     public static final String SEPARATOR = "::";
 
@@ -218,8 +227,29 @@ public abstract class Connection {
                 MainActivity.getPlaylist().setPlaylistIndex(Integer.parseInt(message[1]));
                 MainActivity.getPlaylistView().updateListView();
                 break;
+
+            case FILECHOOSER_SHOW:
+                MainActivity.getInstance().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        desktopFileChooser = new DesktopFileChooser(MainActivity.getInstance(), Utils.makeListFromMessage(message));
+                        desktopFileChooser.showDialog();
+                    }
+                });
+                break;
+
+            case FILECHOOSER_DIRECTORY_TREE:
+                desktopFileChooser.setList(Utils.makeListFromMessage(message));
+                break;
+
+            case FILECHOOSER_DRIVE_LIST:
+                desktopFileChooser.setList(Utils.makeListFromMessage(message));
+                break;
+
         }
     }
+
+    private static DesktopFileChooser desktopFileChooser;
 
 
     private static PopupWindow popupWindow;
