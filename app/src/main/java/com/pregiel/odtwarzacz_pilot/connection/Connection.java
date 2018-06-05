@@ -23,6 +23,7 @@ import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -99,11 +100,13 @@ public abstract class Connection {
                     getMessage();
 
 
-                } catch (SocketException e) {
+                } catch (SocketException | EOFException e) {
                     disconnect();
                     Connection.showConnectionChooser();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    disconnect();
+                    Connection.showConnectionChooser();
                 }
 
             }
