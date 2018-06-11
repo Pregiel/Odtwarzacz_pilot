@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 
 import com.pregiel.odtwarzacz_pilot.R;
@@ -22,6 +23,8 @@ public class PilotView {
         return view;
     }
 
+    public ImageView imageView;
+
 //    public void setConnection(Connection connection) {
 //        PilotView.connection = connection;
 //    }
@@ -33,7 +36,10 @@ public class PilotView {
     public View makeView(LayoutInflater inflater, ViewGroup container) {
         view = inflater.inflate(R.layout.view_pilot, container, false);
 
-        Connection.showConnectionChooser();
+        if (!Connection.isConnected()) {
+            Connection.showConnectionChooser();
+
+        }
 
         SeekBar timeSlider = view.findViewById(R.id.timeSlider);
 //        PilotView.view = view;
@@ -56,6 +62,13 @@ public class PilotView {
             }
         });
 
+//        timeSlider.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                return false;
+//            }
+//        });
+
         SeekBar volumeSlider = view.findViewById(R.id.volumeSlider);
         volumeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -73,15 +86,17 @@ public class PilotView {
 //                if (connection != null) {
                 if (isMuted()) {
                     Connection.sendMessage(Connection.UNMUTE);
-//                    }
-                    Connection.sendMessage(Connection.VOLUME, ((double) seekBar.getProgress()) / 100);
                 }
+                Connection.sendMessage(Connection.VOLUME, ((double) seekBar.getProgress()) / 100);
+
             }
         });
 
         ImageButton backwardButton = view.findViewById(R.id.btnBackward);
         ImageButton forwardButton = view.findViewById(R.id.btnForward);
         ImageButton playButton = view.findViewById(R.id.btnPlay);
+
+        imageView = view.findViewById(R.id.imageView);
 
         backwardButton.setOnTouchListener(new View.OnTouchListener() {
             @Override

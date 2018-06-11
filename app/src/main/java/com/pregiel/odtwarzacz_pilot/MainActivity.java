@@ -25,8 +25,10 @@ import android.widget.RelativeLayout;
 
 import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooser;
 import com.pregiel.odtwarzacz_pilot.Playlist.Playlist;
+import com.pregiel.odtwarzacz_pilot.Views.PageListener;
 import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 import com.pregiel.odtwarzacz_pilot.Views.PlaylistView;
+import com.pregiel.odtwarzacz_pilot.Views.PreviewView;
 import com.pregiel.odtwarzacz_pilot.connection.BTConnection;
 import com.pregiel.odtwarzacz_pilot.connection.WifiConnection;
 
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private static PilotView pilotView;
     private static PlaylistView playlistView;
+    private static PreviewView previewView;
 
     private static MainActivity instance;
 
@@ -69,11 +72,16 @@ public class MainActivity extends AppCompatActivity {
         return playlistView;
     }
 
+    public static PreviewView getPreviewView() {
+        return previewView;
+    }
+
     private static Playlist playlist;
 
     public static Playlist getPlaylist() {
         return playlist;
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,14 +99,17 @@ public class MainActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setOffscreenPageLimit(2);
+
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        mViewPager.addOnPageChangeListener(new PageListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
 
         pilotView = new PilotView();
         playlistView = new PlaylistView();
+        previewView = new PreviewView();
 
         playlist = new Playlist();
     }
@@ -147,10 +158,13 @@ public class MainActivity extends AppCompatActivity {
             return fragment;
         }
 
+
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             int currentTab = getArguments().getInt(ARG_SECTION_NUMBER);
+            System.out.println(currentTab);
             View rootView = null;
             switch (currentTab) {
                 case 1:
@@ -160,6 +174,9 @@ public class MainActivity extends AppCompatActivity {
                 case 2:
                     rootView = playlistView.makeView(inflater, container);
                     break;
+
+                case 3:
+                    rootView = previewView.makeView(inflater, container);
             }
             return rootView;
         }
@@ -175,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
             super(fm);
         }
 
+
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
@@ -185,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 2;
+            return 3;
         }
     }
 }

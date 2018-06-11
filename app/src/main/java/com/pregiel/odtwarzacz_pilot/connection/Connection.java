@@ -3,14 +3,18 @@ package com.pregiel.odtwarzacz_pilot.connection;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -23,6 +27,7 @@ import com.pregiel.odtwarzacz_pilot.R;
 import com.pregiel.odtwarzacz_pilot.Utils;
 import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -31,6 +36,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
@@ -62,6 +68,8 @@ public abstract class Connection {
     public static final String FILECHOOSER_DRIVE_LIST = "FILECHOOSER_DRIVE_LIST";
     public static final String FILECHOOSER_PLAY = "FILECHOOSER_PLAY";
     public static final String FILECHOOSER_PLAYLIST_ADD = "FILECHOOSER_PLAYLIST_ADD";
+    public static final String SNAPSHOT = "SNAPSHOT";
+    public static final String SNAPSHOT_REQUEST = "SNAPSHOT_REQUEST";
 
     public static final String SEPARATOR = "::";
 
@@ -104,12 +112,12 @@ public abstract class Connection {
 
                 try {
                     msg_received = DIS.readUTF();
-                    System.out.println(msg_received);
+//                    System.out.println(msg_received);
                     mediaController(msg_received);
-                    getMessage();
 
 
                 } catch (SocketException | EOFException e) {
+                    e.printStackTrace();
                     disconnect();
                     Connection.showConnectionChooser();
                 } catch (IOException e) {
@@ -122,6 +130,54 @@ public abstract class Connection {
         });
         connect.setDaemon(true);
         connect.start();
+    }
+
+    private static byte[] img;
+    private static int length;
+
+    private static void getImage() {
+        Thread connect = new Thread(new Runnable() {
+            byte[] img_received;
+
+            @Override
+            public void run() {
+
+                try {
+                    img_received = new byte[length];
+                    DIS.readFully(img_received, 0, length);
+
+                    img = img_received;
+                    makeImage(img);
+                    getMessage();
+                } catch (SocketException | EOFException e) {
+                    e.printStackTrace();
+                    disconnect();
+                    Connection.showConnectionChooser();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    disconnect();
+                    Connection.showConnectionChooser();
+                }
+
+            }
+        });
+        connect.setDaemon(true);
+        connect.start();
+    }
+
+    private static void makeImage(byte[] bytes) {
+        final Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+//                MainActivity.getPilotView().imageView.setImageBitmap(bitmap);
+
+                if (MainActivity.getPreviewView().getPreviewImageView() != null) {
+                    MainActivity.getPreviewView().getPreviewImageView().setImageBitmap(bitmap);
+                }
+            }
+        });
     }
 
 
@@ -169,7 +225,7 @@ public abstract class Connection {
     public static void mediaController(String msg) {
         final String[] message = msg.split(Connection.SEPARATOR);
 
-
+        boolean getNextMessage = true;
         switch (message[0]) {
             case TIME:
                 final TextView timeText = MainActivity.getPilotView().getView().findViewById(R.id.timeView);
@@ -246,6 +302,16 @@ public abstract class Connection {
                 desktopFileChooser.setList(Utils.makeListFromMessage(message));
                 break;
 
+            case SNAPSHOT:
+                getNextMessage = false;
+                length = Integer.valueOf(message[1]);
+                getImage();
+                break;
+
+        }
+
+        if (getNextMessage) {
+            getMessage();
         }
     }
 
