@@ -149,6 +149,12 @@ public abstract class Connection {
                     img = img_received;
                     makeImage(img);
                     getMessage();
+                    MainActivity.getInstance().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
+                        }
+                    });
                 } catch (SocketException | EOFException e) {
                     e.printStackTrace();
                     disconnect();

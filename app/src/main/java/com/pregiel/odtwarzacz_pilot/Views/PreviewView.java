@@ -39,25 +39,30 @@ public class PreviewView {
     private Runnable runnable;
 
     public void setPreviewHandler() {
-
-
-        handler = new Handler();
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
-
-                handler.postDelayed(this, SNAPSHOT_REQUEST_DELAY);
-            }
-        };
-
-
         MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                handler.postDelayed(runnable, SNAPSHOT_REQUEST_DELAY);
+                Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
             }
         });
+
+//        handler = new Handler();
+//        runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
+//
+//                handler.postDelayed(this, SNAPSHOT_REQUEST_DELAY);
+//            }
+//        };
+//
+//
+//        MainActivity.getInstance().runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                handler.postDelayed(runnable, SNAPSHOT_REQUEST_DELAY);
+//            }
+//        });
     }
 
     public void removePreviewHandler() {
