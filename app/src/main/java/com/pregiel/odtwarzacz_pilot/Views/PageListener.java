@@ -3,6 +3,7 @@ package com.pregiel.odtwarzacz_pilot.Views;
 import android.support.design.widget.TabLayout;
 
 import com.pregiel.odtwarzacz_pilot.MainActivity;
+import com.pregiel.odtwarzacz_pilot.connection.Connection;
 
 
 public class PageListener extends TabLayout.TabLayoutOnPageChangeListener {
@@ -15,10 +16,12 @@ public class PageListener extends TabLayout.TabLayoutOnPageChangeListener {
         super.onPageSelected(position);
         System.out.println(position);
         if (position == 2) {
-            MainActivity.getPreviewView().setPreviewHandler();
+
+            Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
+            Connection.setShowPreview(true);
         } else {
 
-            MainActivity.getPreviewView().removePreviewHandler();
+            Connection.setShowPreview(false);
         }
     }
 }

@@ -17,6 +17,7 @@ public class PreviewView {
     private View view;
 
 
+
     private ImageView previewImageView;
 
     public View makeView(LayoutInflater inflater, ViewGroup container) {
@@ -34,44 +35,5 @@ public class PreviewView {
     public ImageView getPreviewImageView() {
         return previewImageView;
     }
-
-    private Handler handler;
-    private Runnable runnable;
-
-    public void setPreviewHandler() {
-        MainActivity.getInstance().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
-            }
-        });
-
-//        handler = new Handler();
-//        runnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
-//
-//                handler.postDelayed(this, SNAPSHOT_REQUEST_DELAY);
-//            }
-//        };
-//
-//
-//        MainActivity.getInstance().runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                handler.postDelayed(runnable, SNAPSHOT_REQUEST_DELAY);
-//            }
-//        });
-    }
-
-    public void removePreviewHandler() {
-        if (handler != null) {
-            if (runnable != null) {
-                handler.removeCallbacks(runnable);
-            }
-        }
-    }
-
 
 }

@@ -134,6 +134,11 @@ public abstract class Connection {
 
     private static byte[] img;
     private static int length;
+    private static boolean showPreview = false;
+
+    public static void setShowPreview(boolean showPreview) {
+        Connection.showPreview = showPreview;
+    }
 
     private static void getImage() {
         Thread connect = new Thread(new Runnable() {
@@ -149,12 +154,11 @@ public abstract class Connection {
                     img = img_received;
                     makeImage(img);
                     getMessage();
-                    MainActivity.getInstance().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
-                        }
-                    });
+
+                    if (showPreview) {
+                        Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
+                    }
+
                 } catch (SocketException | EOFException e) {
                     e.printStackTrace();
                     disconnect();
