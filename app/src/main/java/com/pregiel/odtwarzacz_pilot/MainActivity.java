@@ -133,6 +133,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void testFunc(View view) {
+        System.out.println("tak");
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -168,7 +172,8 @@ public class MainActivity extends AppCompatActivity {
             View rootView = null;
             switch (currentTab) {
                 case 1:
-                    rootView = pilotView.makeView(inflater, container);
+//                    rootView = pilotView.makeView(inflater, container);
+                    rootView = inflater.inflate(R.layout.view_pilot, container, false);
                     break;
 
                 case 2:
