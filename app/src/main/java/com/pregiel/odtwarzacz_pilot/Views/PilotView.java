@@ -135,6 +135,18 @@ public class PilotView {
             }
         });
 
+
+        ImageButton muteButton = view.findViewById(R.id.btn_mute);
+        ImageButton randomButton = view.findViewById(R.id.btn_random);
+        ImageButton repeatButton = view.findViewById(R.id.btn_repeat);
+
+        muteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: zmiana kolorow
+            }
+        });
+
         return view;
     }
 

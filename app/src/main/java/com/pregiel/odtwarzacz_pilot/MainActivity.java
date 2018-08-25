@@ -3,6 +3,8 @@ package com.pregiel.odtwarzacz_pilot;
 import android.Manifest;
 import android.app.ActionBar;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,12 +19,15 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 
+import com.devs.vectorchildfinder.VectorChildFinder;
 import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooser;
 import com.pregiel.odtwarzacz_pilot.Playlist.Playlist;
 import com.pregiel.odtwarzacz_pilot.Views.PageListener;
@@ -112,6 +117,9 @@ public class MainActivity extends AppCompatActivity {
         previewView = new PreviewView();
 
         playlist = new Playlist();
+
+
+
     }
 
 
@@ -135,6 +143,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void testFunc(View view) {
         System.out.println("tak");
+//        ImageButton button = findViewById(R.id.btn_play);
+//        VectorChildFinder vectorChildFinder = new VectorChildFinder(this, R.drawable.ic_play_circle, button);
+//        vectorChildFinder.findPathByName("circle").setFillColor(Color.BLUE);
     }
 
     /**
