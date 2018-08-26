@@ -59,10 +59,21 @@ public abstract class Connection {
     public static final String PLAYLIST_UPDATE = "PLAYLIST_UPDATE";
     public static final String PLAYLIST_PLAY = "PLAYLIST_PLAY";
     public static final String PLAYLIST_PLAYING_INDEX = "PLAYLIST_PLAYING_INDEX";
+
     public static final String FORWARD_PRESSED = "FORWARD_PRESSED";
     public static final String FORWARD_RELEASED = "FORWARD_RELEASED";
+    public static final String FORWARD_CLICKED = "FORWARD_CLICKED";
     public static final String BACKWARD_PRESSED = "BACKWARD_PRESSED";
     public static final String BACKWARD_RELEASED = "BACKWARD_RELEASED";
+    public static final String BACKWARD_CLICKED = "BACKWARD_CLICKED";
+
+    public static final String VOLUME_UP_PRESSED = "VOLUME_UP_PRESSED";
+    public static final String VOLUME_UP_RELEASED = "VOLUME_UP_RELEASED";
+    public static final String VOLUME_UP_CLICKED = "VOLUME_UP_CLICKED";
+    public static final String VOLUME_DOWN_PRESSED = "VOLUME_DOWN_PRESSED";
+    public static final String VOLUME_DOWN_RELEASED = "VOLUME_DOWN_RELEASED";
+    public static final String VOLUME_DOWN_CLICKED = "VOLUME_DOWN_CLICKED";
+
     public static final String FILECHOOSER_DIRECTORY_TREE = "FILECHOOSER_DIRECTORY_TREE";
     public static final String FILECHOOSER_SHOW = "FILECHOOSER_SHOW";
     public static final String FILECHOOSER_DRIVE_LIST = "FILECHOOSER_DRIVE_LIST";
@@ -207,6 +218,7 @@ public abstract class Connection {
 
 
     public static void sendMessage(Object... messages) {
+        System.out.println(Arrays.toString(messages));
         if (isConnected()) {
             StringBuilder stringBuilder = new StringBuilder();
             for (Object o : messages) {
@@ -238,18 +250,15 @@ public abstract class Connection {
         boolean getNextMessage = true;
         switch (message[0]) {
             case TIME:
-                final TextView timeText = MainActivity.getPilotView().getView().findViewById(R.id.timeView);
-                final SeekBar timeSlider = MainActivity.getPilotView().getView().findViewById(R.id.timeSlider);
                 final double currentTimeMilis = Double.parseDouble(message[1]);
                 final double mediaTimeMilis = Double.parseDouble(message[2]);
-
-                final String newText = Utils.milisToString(currentTimeMilis) + "/" + Utils.milisToString(mediaTimeMilis);
 
                 ((Activity) MainActivity.getPilotView().getView().getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        timeText.setText(newText);
-                        timeSlider.setProgress((((int) currentTimeMilis * 100) / (int) mediaTimeMilis));
+                        MainActivity.getPilotView().getTimeTotalText().setText(String.valueOf(mediaTimeMilis));
+                        MainActivity.getPilotView().getTimeCurrentText().setText(String.valueOf(currentTimeMilis));
+                        MainActivity.getPilotView().getTimeSlider().setProgress((((int) currentTimeMilis * 100) / (int) mediaTimeMilis));
                     }
                 });
                 break;
@@ -257,14 +266,14 @@ public abstract class Connection {
             case VOLUME:
                 final double volumeValue = Double.parseDouble(message[1]) * 100;
 
-                final SeekBar volumeSlider = MainActivity.getPilotView().getView().findViewById(R.id.volumeSlider);
+//                final SeekBar volumeSlider = MainActivity.getPilotView().getView().findViewById(R.id.volumeSlider);
 
-                ((Activity) MainActivity.getPilotView().getView().getContext()).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        volumeSlider.setProgress((int) volumeValue);
-                    }
-                });
+//                ((Activity) MainActivity.getPilotView().getView().getContext()).runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        volumeSlider.setProgress((int) volumeValue);
+//                    }
+//                });
                 break;
 
             case MUTE:
@@ -362,7 +371,7 @@ public abstract class Connection {
         MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+//                popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
             }
         });
     }

@@ -107,7 +107,7 @@
                 android:textSize="12sp" />
 
             <TextView
-                android:id="@+id/lbl_time"
+                android:id="@+id/lbl_time_total"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -245,7 +245,7 @@
         android:contentDescription="@string/img_background_circle"
         android:rotation="270"
         android:tint="@color/icons_press"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/infoBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

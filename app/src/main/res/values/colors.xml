@@ -16,7 +16,7 @@
     <color name="next_foreground">#595959</color>
     <color name="next_background">#515151</color>
     <color name="text_light">#eaeaea</color>
-    <color name="icons_dark">#757575</color>
+    <color name="icons_dark">#9e9e9e</color>
     <color name="icons_on">#00c853</color>
     <color name="icons_press">#e0e0e0</color>
 

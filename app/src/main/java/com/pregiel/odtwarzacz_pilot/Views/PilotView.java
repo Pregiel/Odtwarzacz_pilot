@@ -1,6 +1,7 @@
 package com.pregiel.odtwarzacz_pilot.Views;
 
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -8,9 +9,15 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
+import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.R;
 import com.pregiel.odtwarzacz_pilot.connection.Connection;
+
+import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class PilotView {
 //    private static Connection connection;
@@ -23,7 +30,11 @@ public class PilotView {
         return view;
     }
 
-    public ImageView imageView;
+//    public ImageView imageView;
+
+    private SeekBar timeSlider;
+
+    private TextView timeCurrentText, timeTotalText;
 
 //    public void setConnection(Connection connection) {
 //        PilotView.connection = connection;
@@ -33,15 +44,31 @@ public class PilotView {
 //        return connection;
 //    }
 
+
+    public SeekBar getTimeSlider() {
+        return timeSlider;
+    }
+
+    public TextView getTimeCurrentText() {
+        return timeCurrentText;
+    }
+
+    public TextView getTimeTotalText() {
+        return timeTotalText;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     public View makeView(LayoutInflater inflater, ViewGroup container) {
         view = inflater.inflate(R.layout.view_pilot, container, false);
 
         if (!Connection.isConnected()) {
             Connection.showConnectionChooser();
-
         }
 
-        SeekBar timeSlider = view.findViewById(R.id.timeSlider);
+        timeTotalText = view.findViewById(R.id.lbl_time_total);
+        timeCurrentText = view.findViewById(R.id.lbl_time_current);
+
+        timeSlider = view.findViewById(R.id.slider_time);
 //        PilotView.view = view;
         timeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -69,69 +96,72 @@ public class PilotView {
 //            }
 //        });
 
-        SeekBar volumeSlider = view.findViewById(R.id.volumeSlider);
-        volumeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//        SeekBar volumeSlider = view.findViewById(R.id.volumeSlider);
+//        volumeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+////                if (connection != null) {
+//                if (isMuted()) {
+//                    Connection.sendMessage(Connection.UNMUTE);
+//                }
+//                Connection.sendMessage(Connection.VOLUME, ((double) seekBar.getProgress()) / 100);
+//
+//            }
+//        });
 
-            }
+        ImageButton prevButton = view.findViewById(R.id.btn_prev);
+        ImageButton nextButton = view.findViewById(R.id.btn_next);
+        ImageButton volUpButton = view.findViewById(R.id.btn_vol_up);
+        ImageButton volDownButton = view.findViewById(R.id.btn_vol_down);
+        ImageButton playButton = view.findViewById(R.id.btn_play);
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
 
-            }
+        final ImageView pressPrevButton = view.findViewById(R.id.circle_prev);
+        final ImageView pressNextButton = view.findViewById(R.id.circle_next);
+        final ImageView pressVolUpButton = view.findViewById(R.id.circle_vol_up);
+        final ImageView pressVolDownButton = view.findViewById(R.id.circle_vol_down);
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-//                if (connection != null) {
-                if (isMuted()) {
-                    Connection.sendMessage(Connection.UNMUTE);
-                }
-                Connection.sendMessage(Connection.VOLUME, ((double) seekBar.getProgress()) / 100);
+//        imageView = view.findViewById(R.id.imageView);
 
-            }
-        });
 
-        ImageButton backwardButton = view.findViewById(R.id.btnBackward);
-        ImageButton forwardButton = view.findViewById(R.id.btnForward);
-        ImageButton playButton = view.findViewById(R.id.btnPlay);
+        prevButton.setOnTouchListener(mediaButtonListener(
+                Connection.BACKWARD_PRESSED,
+                Connection.BACKWARD_RELEASED,
+                Connection.BACKWARD_CLICKED,
+                pressPrevButton));
 
-        imageView = view.findViewById(R.id.imageView);
+        nextButton.setOnTouchListener(mediaButtonListener(
+                Connection.FORWARD_PRESSED,
+                Connection.FORWARD_RELEASED,
+                Connection.FORWARD_CLICKED,
+                pressNextButton));
 
-        backwardButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        backwardButtonPressed();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        backwardButtonReleased();
-                        break;
-                }
-                return false;
-            }
-        });
+        volUpButton.setOnTouchListener(mediaButtonListener(
+                Connection.VOLUME_UP_PRESSED,
+                Connection.VOLUME_UP_RELEASED,
+                Connection.VOLUME_UP_CLICKED,
+                pressVolUpButton));
 
-        forwardButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        forwardButtonPressed();
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        forwardButtonReleased();
-                        break;
-                }
-                return false;
-            }
-        });
+        volDownButton.setOnTouchListener(mediaButtonListener(
+                Connection.VOLUME_DOWN_PRESSED,
+                Connection.VOLUME_DOWN_RELEASED,
+                Connection.VOLUME_DOWN_CLICKED,
+                pressVolDownButton));
 
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                play();
+                Connection.sendMessage(Connection.PLAY);
             }
         });
 
@@ -150,36 +180,47 @@ public class PilotView {
         return view;
     }
 
-    public void play() {
-//        if (connection != null) {
-        Connection.sendMessage(Connection.PLAY);
-//        }
-    }
+    private View.OnTouchListener mediaButtonListener(
+            final String pressedMessage, final String releasedMessage, final String clickedMessage, final ImageView pressEffect) {
+        return new View.OnTouchListener() {
+            private static final int MAX_CLICK_DURATION = 500;
+            private long startClickTime;
+            private boolean pressed = false;
 
-    public void forwardButtonPressed() {
-//        if (connection != null) {
-        Connection.sendMessage(Connection.FORWARD_PRESSED);
-//        }
-    }
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        startClickTime = Calendar.getInstance().getTimeInMillis();
 
-    public void forwardButtonReleased() {
-//        if (connection != null) {
-        Connection.sendMessage(Connection.FORWARD_RELEASED);
-//        }
-    }
+                        new Timer().schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                if (pressed) {
+                                    Connection.sendMessage(pressedMessage);
+                                }
+                            }
+                        }, MAX_CLICK_DURATION);
 
-    public void backwardButtonPressed() {
-//        if (connection != null) {
-        Connection.sendMessage(Connection.BACKWARD_PRESSED);
-//        }
-    }
+                        pressEffect.setVisibility(View.VISIBLE);
+                        pressed = true;
+                        return true;
 
-    public void backwardButtonReleased() {
-//        if (connection != null) {
-        Connection.sendMessage(Connection.BACKWARD_RELEASED);
-//        }
+                    case MotionEvent.ACTION_UP:
+                        long clickDuration = Calendar.getInstance().getTimeInMillis() - startClickTime;
+                        if (clickDuration < MAX_CLICK_DURATION) {
+                            Connection.sendMessage(clickedMessage);
+                        } else {
+                            Connection.sendMessage(releasedMessage);
+                        }
+                        pressEffect.setVisibility(View.INVISIBLE);
+                        pressed = false;
+                        return true;
+                }
+                return false;
+            }
+        };
     }
-
 
     public boolean isMuted() {
         return muted;

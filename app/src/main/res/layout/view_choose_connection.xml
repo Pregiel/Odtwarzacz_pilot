@@ -10,7 +10,7 @@
         android:background="@android:color/background_light"
         android:orientation="vertical"
         android:padding="22dp"
-        android:visibility="invisible">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/textView"
