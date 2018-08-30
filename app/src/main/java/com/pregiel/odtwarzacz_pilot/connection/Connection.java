@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioFormat;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -27,6 +28,8 @@ import com.pregiel.odtwarzacz_pilot.R;
 import com.pregiel.odtwarzacz_pilot.Utils;
 import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -34,9 +37,11 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
@@ -48,13 +53,28 @@ import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 public abstract class Connection {
 
     public static final String PLAY = "PLAY";
+    public static final String PAUSE = "PAUSE";
     public static final String FORWARD = "FORWARD";
     public static final String BACKWARD = "BACKWARD";
     public static final String TIME = "TIME";
     public static final String VOLUME = "VOLUME";
     public static final String MUTE = "MUTE";
+    public static final String MUTE_ON = "MUTE_ON";
+    public static final String MUTE_OFF = "MUTE_OFF";
     public static final String UNMUTE = "UNMUTE";
+    public static final String RANDOM = "RANDOM";
+    public static final String RANDOM_ON = "RANDOM_ON";
+    public static final String RANDOM_OFF = "RANDOM_OFF";
+    public static final String REPEAT = "REPEAT";
+    public static final String REPEAT_ON = "REPEAT_ON";
+    public static final String REPEAT_OFF = "REPEAT_OFF";
+
     public static final String DEVICE_NAME = "DEVICE_NAME";
+    public static final String FILE_NAME = "FILE_NAME";
+
+    public static final String TIMESLIDER_START = "TIMESLIDER_START";
+    public static final String TIMESLIDER_STOP = "TIMESLIDER_STOP";
+
     public static final String PLAYLIST_SEND = "PLAYLIST_SEND";
     public static final String PLAYLIST_UPDATE = "PLAYLIST_UPDATE";
     public static final String PLAYLIST_PLAY = "PLAYLIST_PLAY";
@@ -79,6 +99,7 @@ public abstract class Connection {
     public static final String FILECHOOSER_DRIVE_LIST = "FILECHOOSER_DRIVE_LIST";
     public static final String FILECHOOSER_PLAY = "FILECHOOSER_PLAY";
     public static final String FILECHOOSER_PLAYLIST_ADD = "FILECHOOSER_PLAYLIST_ADD";
+
     public static final String SNAPSHOT = "SNAPSHOT";
     public static final String SNAPSHOT_REQUEST = "SNAPSHOT_REQUEST";
 
@@ -166,9 +187,9 @@ public abstract class Connection {
                     makeImage(img);
                     getMessage();
 
-                    if (showPreview) {
-                        Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
-                    }
+//                    if (showPreview) {
+//                        Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
+//                    }
 
                 } catch (SocketException | EOFException e) {
                     e.printStackTrace();
@@ -192,11 +213,11 @@ public abstract class Connection {
         MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                MainActivity.getPilotView().imageView.setImageBitmap(bitmap);
+                MainActivity.getPilotView().getImgPreview().setImageBitmap(bitmap);
 
-                if (MainActivity.getPreviewView().getPreviewImageView() != null) {
-                    MainActivity.getPreviewView().getPreviewImageView().setImageBitmap(bitmap);
-                }
+//                if (MainActivity.getPreviewView().getPreviewImageView() != null) {
+//                    MainActivity.getPreviewView().getPreviewImageView().setImageBitmap(bitmap);
+//                }
             }
         });
     }
@@ -246,18 +267,19 @@ public abstract class Connection {
 
     public static void mediaController(String msg) {
         final String[] message = msg.split(Connection.SEPARATOR);
-
+//        System.out.println(msg);
         boolean getNextMessage = true;
         switch (message[0]) {
             case TIME:
                 final double currentTimeMilis = Double.parseDouble(message[1]);
                 final double mediaTimeMilis = Double.parseDouble(message[2]);
 
+
                 ((Activity) MainActivity.getPilotView().getView().getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.getPilotView().getTimeTotalText().setText(String.valueOf(mediaTimeMilis));
-                        MainActivity.getPilotView().getTimeCurrentText().setText(String.valueOf(currentTimeMilis));
+                        MainActivity.getPilotView().getTimeTotalText().setText(Utils.milisToString(mediaTimeMilis));
+                        MainActivity.getPilotView().getTimeCurrentText().setText(Utils.milisToString(currentTimeMilis));
                         MainActivity.getPilotView().getTimeSlider().setProgress((((int) currentTimeMilis * 100) / (int) mediaTimeMilis));
                     }
                 });
@@ -276,12 +298,28 @@ public abstract class Connection {
 //                });
                 break;
 
-            case MUTE:
+            case MUTE_ON:
                 MainActivity.getPilotView().setMuted(true);
                 break;
 
-            case UNMUTE:
+            case MUTE_OFF:
                 MainActivity.getPilotView().setMuted(false);
+                break;
+
+            case REPEAT_ON:
+                MainActivity.getPilotView().setRepeat(true);
+                break;
+
+            case REPEAT_OFF:
+                MainActivity.getPilotView().setRepeat(false);
+                break;
+
+            case RANDOM_ON:
+                MainActivity.getPilotView().setRandom(true);
+                break;
+
+            case RANDOM_OFF:
+                MainActivity.getPilotView().setRandom(false);
                 break;
 
             case DEVICE_NAME:
@@ -289,6 +327,18 @@ public abstract class Connection {
                     @Override
                     public void run() {
                         Toast.makeText(MainActivity.getPilotView().getView().getContext(), MainActivity.getPilotView().getView().getContext().getString(R.string.connected_with, message[1]), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                break;
+
+            case FILE_NAME:
+                MainActivity.getInstance().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.getPilotView().getLblFilename().setText(message[1]);
+
+                        MainActivity.getPilotView().getLblAuthor().setText(message.length > 2 ? message[2] : "");
+
                     }
                 });
                 break;
@@ -323,8 +373,12 @@ public abstract class Connection {
 
             case SNAPSHOT:
                 getNextMessage = false;
-                length = Integer.valueOf(message[1]);
+                length = Integer.valueOf(message[3]);
                 getImage();
+                if (MainActivity.getPilotView().isSendTime()) {
+                    sendMessage(SNAPSHOT_REQUEST);
+                }
+                System.out.println("SNAPSHOT " + message[1] + " " + message[2] + " " + Calendar.getInstance().getTimeInMillis());
                 break;
 
         }
@@ -335,7 +389,6 @@ public abstract class Connection {
     }
 
     private static DesktopFileChooser desktopFileChooser;
-
 
     private static PopupWindow popupWindow;
 
@@ -371,7 +424,7 @@ public abstract class Connection {
         MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+                popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
             }
         });
     }

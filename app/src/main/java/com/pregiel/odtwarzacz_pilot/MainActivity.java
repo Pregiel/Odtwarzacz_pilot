@@ -30,6 +30,7 @@ import android.widget.RelativeLayout;
 import com.devs.vectorchildfinder.VectorChildFinder;
 import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooser;
 import com.pregiel.odtwarzacz_pilot.Playlist.Playlist;
+import com.pregiel.odtwarzacz_pilot.Views.MyViewPager;
 import com.pregiel.odtwarzacz_pilot.Views.PageListener;
 import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 import com.pregiel.odtwarzacz_pilot.Views.PlaylistView;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    private ViewPager mViewPager;
+    private MyViewPager mViewPager;
     private static PilotView pilotView;
     private static PlaylistView playlistView;
     private static PreviewView previewView;
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
 
@@ -122,7 +123,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    public MyViewPager getmViewPager() {
+        return mViewPager;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

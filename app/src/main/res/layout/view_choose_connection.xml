@@ -9,8 +9,7 @@
         android:layout_centerInParent="true"
         android:background="@android:color/background_light"
         android:orientation="vertical"
-        android:padding="22dp"
-        android:visibility="gone">
+        android:padding="22dp">
 
         <TextView
             android:id="@+id/textView"

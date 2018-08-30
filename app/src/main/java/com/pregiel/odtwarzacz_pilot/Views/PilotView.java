@@ -2,17 +2,22 @@ package com.pregiel.odtwarzacz_pilot.Views;
 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.res.Resources;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.R;
+import com.pregiel.odtwarzacz_pilot.Utils;
 import com.pregiel.odtwarzacz_pilot.connection.Connection;
 
 import java.util.Calendar;
@@ -21,6 +26,8 @@ import java.util.TimerTask;
 
 public class PilotView {
 //    private static Connection connection;
+
+    private static final float PREVIEWHEIGHT = 0.6f;
 
     private boolean muted = false;
 
@@ -34,16 +41,13 @@ public class PilotView {
 
     private SeekBar timeSlider;
 
-    private TextView timeCurrentText, timeTotalText;
+    private TextView timeCurrentText, timeTotalText, lblFilename, lblAuthor;
 
-//    public void setConnection(Connection connection) {
-//        PilotView.connection = connection;
-//    }
-//
-//    public static Connection getConnection() {
-//        return connection;
-//    }
+    private String currentFileLabel;
 
+    private RelativeLayout previewLayout;
+
+    private ImageView imgPreview;
 
     public SeekBar getTimeSlider() {
         return timeSlider;
@@ -57,6 +61,16 @@ public class PilotView {
         return timeTotalText;
     }
 
+    public ImageView getImgPreview() {
+        return imgPreview;
+    }
+
+    private boolean sendTime = false;
+
+    public boolean isSendTime() {
+        return sendTime;
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     public View makeView(LayoutInflater inflater, ViewGroup container) {
         view = inflater.inflate(R.layout.view_pilot, container, false);
@@ -64,6 +78,16 @@ public class PilotView {
         if (!Connection.isConnected()) {
             Connection.showConnectionChooser();
         }
+
+        lblFilename = view.findViewById(R.id.lbl_filename);
+        lblAuthor = view.findViewById(R.id.lbl_author);
+
+        imgPreview = view.findViewById(R.id.image_preview);
+        previewLayout = view.findViewById(R.id.previewLayout);
+
+        float previewLayoutsHeight = Resources.getSystem().getDisplayMetrics().heightPixels * PREVIEWHEIGHT;
+
+        previewLayout.getLayoutParams().height = (int) Utils.convertPixelsToDp(previewLayoutsHeight, view.getContext());
 
         timeTotalText = view.findViewById(R.id.lbl_time_total);
         timeCurrentText = view.findViewById(R.id.lbl_time_current);
@@ -73,18 +97,24 @@ public class PilotView {
         timeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
+                if (sendTime) {
+                    Connection.sendMessage(Connection.TIME, (((double) seekBar.getProgress()) / 100));
+                }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                sendTime = true;
+                Connection.sendMessage(Connection.TIMESLIDER_START);
+                previewLayout.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 //                if (connection != null) {
-                Connection.sendMessage(Connection.TIME, (((double) seekBar.getProgress()) / 100));
+                sendTime = false;
+                Connection.sendMessage(Connection.TIMESLIDER_STOP, (((double) seekBar.getProgress()) / 100));
+                previewLayout.setVisibility(View.GONE);
 //                }
             }
         });
@@ -173,7 +203,21 @@ public class PilotView {
         muteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO: zmiana kolorow
+                Connection.sendMessage(Connection.MUTE);
+            }
+        });
+
+        randomButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Connection.sendMessage(Connection.RANDOM);
+            }
+        });
+
+        repeatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Connection.sendMessage(Connection.REPEAT);
             }
         });
 
@@ -204,6 +248,7 @@ public class PilotView {
 
                         pressEffect.setVisibility(View.VISIBLE);
                         pressed = true;
+                        MainActivity.getInstance().getmViewPager().setSwipeEnabled(false);
                         return true;
 
                     case MotionEvent.ACTION_UP:
@@ -215,6 +260,7 @@ public class PilotView {
                         }
                         pressEffect.setVisibility(View.INVISIBLE);
                         pressed = false;
+                        MainActivity.getInstance().getmViewPager().setSwipeEnabled(true);
                         return true;
                 }
                 return false;
@@ -226,10 +272,43 @@ public class PilotView {
         return muted;
     }
 
-    public void setMuted(boolean muted) {
+    public void setMuted(final boolean muted) {
         this.muted = muted;
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ImageButton muteButton = view.findViewById(R.id.btn_mute);
+                muteButton.setColorFilter(ContextCompat.getColor(view.getContext(), muted ? R.color.icons_on : R.color.icons_dark));
+            }
+        });
     }
 
+    public void setRepeat(final boolean repeat) {
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ImageButton repeatButton = view.findViewById(R.id.btn_repeat);
+                repeatButton.setColorFilter(ContextCompat.getColor(view.getContext(), repeat ? R.color.icons_on : R.color.icons_dark));
+            }
+        });
+    }
 
+    public void setRandom(final boolean random) {
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ImageButton randomButton = view.findViewById(R.id.btn_random);
+                randomButton.setColorFilter(ContextCompat.getColor(view.getContext(), random ? R.color.icons_on : R.color.icons_dark));
+            }
+        });
+    }
+
+    public TextView getLblFilename() {
+        return lblFilename;
+    }
+
+    public TextView getLblAuthor() {
+        return lblAuthor;
+    }
 }
 

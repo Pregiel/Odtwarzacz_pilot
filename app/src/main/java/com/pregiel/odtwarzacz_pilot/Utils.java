@@ -1,6 +1,9 @@
 package com.pregiel.odtwarzacz_pilot;
 
 
+import android.content.Context;
+import android.util.DisplayMetrics;
+
 import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooserItem;
 
 import java.util.ArrayList;
@@ -49,5 +52,9 @@ public class Utils {
 
     public static boolean isFile(String file) {
         return file.lastIndexOf(".") > 0;
+    }
+
+    public static float convertPixelsToDp(float px, Context context){
+        return px / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 }

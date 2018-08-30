@@ -68,7 +68,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_above="@+id/nextBar"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:orientation="vertical"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
@@ -130,6 +130,7 @@
         android:layout_alignParentBottom="true"
         android:background="@color/colorPrimaryDark"
         android:orientation="vertical"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -260,6 +261,7 @@
         android:contentDescription="@string/img_background_circle"
         android:tint="@color/colorPrimary"
         app:layout_constraintBottom_toTopOf="@+id/infoBar"
+        app:layout_constraintDimensionRatio="12:9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_playlist"
@@ -329,5 +331,27 @@
         app:layout_constraintStart_toStartOf="@+id/image_circle"
         app:layout_constraintTop_toTopOf="@+id/image_circle"
         app:srcCompat="@drawable/ic_play_circle" />
+
+    <RelativeLayout
+        android:id="@+id/previewLayout"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/image_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            app:srcCompat="@drawable/ic_launcher_background" />
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>
