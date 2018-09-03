@@ -37,6 +37,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -222,12 +223,23 @@ public abstract class Connection {
         });
     }
 
+    private static ServerSocket serverSocket;
+
+    public static ServerSocket getServerSocket() {
+        return serverSocket;
+    }
+
+    public static void setServerSocket(ServerSocket serverSocket) {
+        Connection.serverSocket = serverSocket;
+    }
 
     private static void disconnect() {
         setConnected(false);
         try {
+            serverSocket.close();
             DOS.close();
             DIS.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -418,6 +430,18 @@ public abstract class Connection {
             public void onClick(View view) {
                 BTConnection.searchForDevice(MainActivity.getInstance());
                 BTConnection.connect();
+            }
+        });
+
+        Button usbButton = popupView.findViewById(R.id.btnUsb);
+
+        usbButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
+                        ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED) {
+                    UsbConnection.connect();
+                }
             }
         });
 

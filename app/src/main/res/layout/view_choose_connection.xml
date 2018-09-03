@@ -34,5 +34,12 @@
             android:layout_height="74dp"
             android:text="@string/bluetooth"
             android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btnUsb"
+            android:layout_width="match_parent"
+            android:layout_height="74dp"
+            android:text="@string/usb"
+            android:textSize="18sp" />
     </LinearLayout>
 </RelativeLayout>
