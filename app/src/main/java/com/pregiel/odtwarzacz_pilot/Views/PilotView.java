@@ -41,7 +41,7 @@ public class PilotView {
 
     private SeekBar timeSlider;
 
-    private TextView timeCurrentText, timeTotalText, lblFilename, lblAuthor;
+    private TextView timeCurrentText, timeTotalText, lblFilename, lblAuthor, lblNextFileName, lblNextAuthor;
 
     private String currentFileLabel;
 
@@ -81,6 +81,9 @@ public class PilotView {
 
         lblFilename = view.findViewById(R.id.lbl_filename);
         lblAuthor = view.findViewById(R.id.lbl_author);
+
+        lblNextFileName = view.findViewById(R.id.lbl_next_filename);
+        lblNextAuthor = view.findViewById(R.id.lbl_next_author);
 
         imgPreview = view.findViewById(R.id.image_preview);
         previewLayout = view.findViewById(R.id.previewLayout);
@@ -199,6 +202,7 @@ public class PilotView {
         ImageButton muteButton = view.findViewById(R.id.btn_mute);
         ImageButton randomButton = view.findViewById(R.id.btn_random);
         ImageButton repeatButton = view.findViewById(R.id.btn_repeat);
+        ImageButton rerollButton = view.findViewById(R.id.btn_reroll);
 
         muteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -221,11 +225,19 @@ public class PilotView {
             }
         });
 
+        rerollButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Connection.sendMessage(Connection.REROLL);
+            }
+        });
+
         return view;
     }
 
     private View.OnTouchListener mediaButtonListener(
-            final String pressedMessage, final String releasedMessage, final String clickedMessage, final ImageView pressEffect) {
+            final String pressedMessage, final String releasedMessage,
+            final String clickedMessage, final ImageView pressEffect) {
         return new View.OnTouchListener() {
             private static final int MAX_CLICK_DURATION = 500;
             private long startClickTime;
@@ -309,6 +321,14 @@ public class PilotView {
 
     public TextView getLblAuthor() {
         return lblAuthor;
+    }
+
+    public TextView getLblNextFileName() {
+        return lblNextFileName;
+    }
+
+    public TextView getLblNextAuthor() {
+        return lblNextAuthor;
     }
 }
 

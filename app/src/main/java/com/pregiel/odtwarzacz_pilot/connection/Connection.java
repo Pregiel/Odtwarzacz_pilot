@@ -69,9 +69,11 @@ public abstract class Connection {
     public static final String REPEAT = "REPEAT";
     public static final String REPEAT_ON = "REPEAT_ON";
     public static final String REPEAT_OFF = "REPEAT_OFF";
+    public static final String REROLL = "REROLL";
 
     public static final String DEVICE_NAME = "DEVICE_NAME";
     public static final String FILE_NAME = "FILE_NAME";
+    public static final String NEXT_FILE = "NEXT_FILE";
 
     public static final String TIMESLIDER_START = "TIMESLIDER_START";
     public static final String TIMESLIDER_STOP = "TIMESLIDER_STOP";
@@ -355,6 +357,23 @@ public abstract class Connection {
                 });
                 break;
 
+            case NEXT_FILE:
+                MainActivity.getInstance().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.getPilotView().getLblNextFileName().setText(message[2]);
+
+                        if (message.length > 3) {
+                            MainActivity.getPilotView().getLblNextAuthor().setVisibility(View.VISIBLE);
+                            MainActivity.getPilotView().getLblNextAuthor().setText(message[3]);
+                        } else {
+                            MainActivity.getPilotView().getLblNextAuthor().setVisibility(View.GONE);
+                        }
+
+                    }
+                });
+                break;
+
             case PLAYLIST_SEND:
                 MainActivity.getPlaylist().makePlaylist(message);
                 MainActivity.getPlaylistView().updateListView();
@@ -390,7 +409,7 @@ public abstract class Connection {
                 if (MainActivity.getPilotView().isSendTime()) {
                     sendMessage(SNAPSHOT_REQUEST);
                 }
-                System.out.println("SNAPSHOT " + message[1] + " " + message[2] + " " + Calendar.getInstance().getTimeInMillis());
+//                System.out.println("SNAPSHOT " + message[1] + " " + message[2] + " " + Calendar.getInstance().getTimeInMillis());
                 break;
 
         }
