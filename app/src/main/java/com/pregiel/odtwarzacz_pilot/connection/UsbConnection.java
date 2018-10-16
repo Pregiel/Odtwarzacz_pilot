@@ -19,7 +19,7 @@ import java.util.Enumeration;
 public class UsbConnection extends Connection {
     private static Socket socket;
 
-    private final static int PORT = 1755;
+    private final static int PORT = 38300;
     private final static int TIMEOUT = 200;
 
 
@@ -47,7 +47,7 @@ public class UsbConnection extends Connection {
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-                setServerSocket(new ServerSocket(38300));
+                setServerSocket(new ServerSocket(PORT));
                 socket = getServerSocket().accept();
             } catch (IOException e) {
                 e.printStackTrace();

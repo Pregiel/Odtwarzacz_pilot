@@ -2,6 +2,7 @@ package com.pregiel.odtwarzacz_pilot;
 
 import android.Manifest;
 import android.app.ActionBar;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;

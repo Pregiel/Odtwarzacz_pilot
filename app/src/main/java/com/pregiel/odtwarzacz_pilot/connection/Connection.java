@@ -397,7 +397,6 @@ public abstract class Connection {
             case FILECHOOSER_DIRECTORY_TREE:
                 desktopFileChooser.setList(Utils.makeListFromMessage(message));
                 break;
-
             case FILECHOOSER_DRIVE_LIST:
                 desktopFileChooser.setList(Utils.makeListFromMessage(message));
                 break;
