@@ -5,45 +5,32 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.AudioFormat;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooser;
-import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooserItem;
 import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.R;
 import com.pregiel.odtwarzacz_pilot.Utils;
-import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UTFDataFormatException;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
@@ -58,6 +45,7 @@ public abstract class Connection {
     public static final String FORWARD = "FORWARD";
     public static final String BACKWARD = "BACKWARD";
     public static final String TIME = "TIME";
+    public static final String DURATION = "DURATION";
     public static final String VOLUME = "VOLUME";
     public static final String MUTE = "MUTE";
     public static final String MUTE_ON = "MUTE_ON";
@@ -150,7 +138,9 @@ public abstract class Connection {
 //                    System.out.println(msg_received);
                     mediaController(msg_received);
 
-
+                } catch (UTFDataFormatException e) {
+                    e.printStackTrace();
+                    getMessage();
                 } catch (SocketException | EOFException e) {
                     e.printStackTrace();
                     disconnect();
@@ -237,6 +227,9 @@ public abstract class Connection {
 
     private static void disconnect() {
         setConnected(false);
+        if (MainActivity.getPilotView().getTimer() != null) {
+            MainActivity.getPilotView().getTimer().cancel();
+        }
         try {
             serverSocket.close();
             DOS.close();
@@ -247,10 +240,6 @@ public abstract class Connection {
         }
 
     }
-//    public static void connect(PilotView view) {
-//
-//    }
-
 
     public static void sendMessage(Object... messages) {
         System.out.println(Arrays.toString(messages));
@@ -281,22 +270,40 @@ public abstract class Connection {
 
     public static void mediaController(String msg) {
         final String[] message = msg.split(Connection.SEPARATOR);
-//        System.out.println(msg);
+        System.out.println(msg);
         boolean getNextMessage = true;
         switch (message[0]) {
             case TIME:
-                final double currentTimeMilis = Double.parseDouble(message[1]);
-                final double mediaTimeMilis = Double.parseDouble(message[2]);
-
+                final double currentTimeMillis = Double.parseDouble(message[1]);
 
                 ((Activity) MainActivity.getPilotView().getView().getContext()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.getPilotView().getTimeTotalText().setText(Utils.milisToString(mediaTimeMilis));
-                        MainActivity.getPilotView().getTimeCurrentText().setText(Utils.milisToString(currentTimeMilis));
-                        MainActivity.getPilotView().getTimeSlider().setProgress((((int) currentTimeMilis * 100) / (int) mediaTimeMilis));
+                        if (!MainActivity.getPilotView().isSendTime()) {
+                            MainActivity.getPilotView().getTimeCurrentText().setText(Utils.millisToString(currentTimeMillis));
+                            MainActivity.getPilotView().setTime(currentTimeMillis);
+                            MainActivity.getPilotView().getTimeSlider().setProgress((((int) currentTimeMillis * 100) / (int) MainActivity.getPilotView().getTotalTime()));
+                        }
                     }
                 });
+                break;
+
+            case DURATION:
+                MainActivity.getPilotView().setTotalTime(Double.parseDouble(message[1]));
+                ((Activity) MainActivity.getPilotView().getView().getContext()).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MainActivity.getPilotView().getTimeTotalText().setText(Utils.millisToString(
+                                MainActivity.getPilotView().getTotalTime()
+                        ));
+                    }
+                });
+
+                if (message[2].equals("PLAYING")) {
+                    MainActivity.getPilotView().setPlaying(true);
+                } else {
+                    MainActivity.getPilotView().setPlaying(false);
+                }
                 break;
 
             case VOLUME:
@@ -352,7 +359,28 @@ public abstract class Connection {
                         MainActivity.getPilotView().getLblFilename().setText(message[1]);
 
                         MainActivity.getPilotView().getLblAuthor().setText(message.length > 2 ? message[2] : "");
+                    }
+                });
+                break;
 
+            case PLAY:
+                MainActivity.getInstance().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final double currentTimeMillis = Double.parseDouble(message[1]);
+                        MainActivity.getPilotView().switchPlayButton(0, currentTimeMillis);
+                        MainActivity.getPilotView().getTimeCurrentText().setText(Utils.millisToString(currentTimeMillis));
+                    }
+                });
+                break;
+
+            case PAUSE:
+                MainActivity.getInstance().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final double currentTimeMillis = Double.parseDouble(message[1].replaceAll("[^\\d.]", ""));
+                        MainActivity.getPilotView().switchPlayButton(1, currentTimeMillis);
+                        MainActivity.getPilotView().getTimeCurrentText().setText(Utils.millisToString(currentTimeMillis));
                     }
                 });
                 break;
@@ -361,13 +389,18 @@ public abstract class Connection {
                 MainActivity.getInstance().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        MainActivity.getPilotView().getLblNextFileName().setText(message[2]);
-
-                        if (message.length > 3) {
-                            MainActivity.getPilotView().getLblNextAuthor().setVisibility(View.VISIBLE);
-                            MainActivity.getPilotView().getLblNextAuthor().setText(message[3]);
+                        if (message[1].equals("NONE")) {
+                            MainActivity.getPilotView().getNextBar().setVisibility(View.GONE);
                         } else {
-                            MainActivity.getPilotView().getLblNextAuthor().setVisibility(View.GONE);
+                            MainActivity.getPilotView().getNextBar().setVisibility(View.VISIBLE);
+                            MainActivity.getPilotView().getLblNextFileName().setText(message[2]);
+
+                            if (message.length > 3) {
+                                MainActivity.getPilotView().getLblNextAuthor().setVisibility(View.VISIBLE);
+                                MainActivity.getPilotView().getLblNextAuthor().setText(message[3]);
+                            } else {
+                                MainActivity.getPilotView().getLblNextAuthor().setVisibility(View.GONE);
+                            }
                         }
 
                     }

@@ -4,6 +4,7 @@ package com.pregiel.odtwarzacz_pilot.Views;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ import com.pregiel.odtwarzacz_pilot.Utils;
 import com.pregiel.odtwarzacz_pilot.connection.Connection;
 
 import java.util.Calendar;
+import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -42,6 +45,10 @@ public class PilotView {
     private SeekBar timeSlider;
 
     private TextView timeCurrentText, timeTotalText, lblFilename, lblAuthor, lblNextFileName, lblNextAuthor;
+
+    private View nextBar;
+
+    private ImageButton playButton;
 
     private String currentFileLabel;
 
@@ -71,6 +78,8 @@ public class PilotView {
         return sendTime;
     }
 
+    private double totalTime;
+
     @SuppressLint("ClickableViewAccessibility")
     public View makeView(LayoutInflater inflater, ViewGroup container) {
         view = inflater.inflate(R.layout.view_pilot, container, false);
@@ -92,11 +101,13 @@ public class PilotView {
 
         previewLayout.getLayoutParams().height = (int) Utils.convertPixelsToDp(previewLayoutsHeight, view.getContext());
 
+        nextBar = view.findViewById(R.id.nextBar);
+
         timeTotalText = view.findViewById(R.id.lbl_time_total);
         timeCurrentText = view.findViewById(R.id.lbl_time_current);
 
         timeSlider = view.findViewById(R.id.slider_time);
-//        PilotView.view = view;
+
         timeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -109,63 +120,30 @@ public class PilotView {
             public void onStartTrackingTouch(SeekBar seekBar) {
                 sendTime = true;
                 Connection.sendMessage(Connection.TIMESLIDER_START);
+                if (timer != null) {
+                    timer.cancel();
+                }
                 previewLayout.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-//                if (connection != null) {
                 sendTime = false;
                 Connection.sendMessage(Connection.TIMESLIDER_STOP, (((double) seekBar.getProgress()) / 100));
                 previewLayout.setVisibility(View.GONE);
-//                }
             }
         });
-
-//        timeSlider.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View view, MotionEvent motionEvent) {
-//                return false;
-//            }
-//        });
-
-//        SeekBar volumeSlider = view.findViewById(R.id.volumeSlider);
-//        volumeSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-//
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-////                if (connection != null) {
-//                if (isMuted()) {
-//                    Connection.sendMessage(Connection.UNMUTE);
-//                }
-//                Connection.sendMessage(Connection.VOLUME, ((double) seekBar.getProgress()) / 100);
-//
-//            }
-//        });
 
         ImageButton prevButton = view.findViewById(R.id.btn_prev);
         ImageButton nextButton = view.findViewById(R.id.btn_next);
         ImageButton volUpButton = view.findViewById(R.id.btn_vol_up);
         ImageButton volDownButton = view.findViewById(R.id.btn_vol_down);
-        ImageButton playButton = view.findViewById(R.id.btn_play);
-
+        playButton = view.findViewById(R.id.btn_play);
 
         final ImageView pressPrevButton = view.findViewById(R.id.circle_prev);
         final ImageView pressNextButton = view.findViewById(R.id.circle_next);
         final ImageView pressVolUpButton = view.findViewById(R.id.circle_vol_up);
         final ImageView pressVolDownButton = view.findViewById(R.id.circle_vol_down);
-
-//        imageView = view.findViewById(R.id.imageView);
-
 
         prevButton.setOnTouchListener(mediaButtonListener(
                 Connection.BACKWARD_PRESSED,
@@ -329,6 +307,81 @@ public class PilotView {
 
     public TextView getLblNextAuthor() {
         return lblNextAuthor;
+    }
+
+    public ImageButton getPlayButton() {
+        return playButton;
+    }
+
+    public View getNextBar() {
+        return nextBar;
+    }
+
+    public double getTotalTime() {
+        return totalTime;
+    }
+
+    public void setTotalTime(double totalTime) {
+        this.totalTime = totalTime;
+    }
+
+    private Timer timer;
+
+    public Timer getTimer() {
+        return timer;
+    }
+
+    private boolean playing;
+
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
+    }
+
+    /**
+     * @param value 0 - play  1 - pause
+     */
+    public void switchPlayButton(int value, double currentTime) {
+        switch (value) {
+            case 0:
+                playButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.getInstance().getApplicationContext(), R.drawable.ic_pause_circle));
+                playing = true;
+                setTime(currentTime);
+                break;
+
+            default:
+                playButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.getInstance().getApplicationContext(), R.drawable.ic_play_circle));
+                timer.cancel();
+                playing = false;
+        }
+    }
+
+    public void setTime(final double currentTime) {
+        if (timer != null) {
+            timer.cancel();
+            timer.purge();
+        }
+
+        if (!sendTime) {
+
+            timer = new Timer();
+            timer.scheduleAtFixedRate(new TimerTask() {
+                double time = currentTime;
+
+                @Override
+                public void run() {
+                    if (playing && MainActivity.getPilotView().getTotalTime() > 0) {
+                        MainActivity.getInstance().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getTimeCurrentText().setText(Utils.millisToString(time));
+                                getTimeSlider().setProgress((((int) time * 100) / (int) MainActivity.getPilotView().getTotalTime()));
+                                time = time + 250;
+                            }
+                        });
+                    }
+                }
+            }, (long) (currentTime % 250), 250);
+        }
     }
 }
 

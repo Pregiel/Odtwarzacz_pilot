@@ -13,7 +13,7 @@ import java.util.Locale;
 
 public class Utils {
 
-    public static String milisToString(double milis) {
+    public static String millisToString(double milis) {
         int seconds = (int) (milis / 1000) % 60;
         int minutes = (int) ((milis / (1000 * 60)) % 60);
         int hours = (int) ((milis / (1000 * 60 * 60)) % 24);
