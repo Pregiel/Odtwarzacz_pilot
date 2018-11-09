@@ -2,7 +2,6 @@ package com.pregiel.odtwarzacz_pilot.Views;
 
 import android.support.design.widget.TabLayout;
 
-import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.connection.Connection;
 
 

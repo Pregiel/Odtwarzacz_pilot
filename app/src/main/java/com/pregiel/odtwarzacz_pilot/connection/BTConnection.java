@@ -11,8 +11,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.app.ActivityCompat;
 
-import com.pregiel.odtwarzacz_pilot.Views.PilotView;
-
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
@@ -111,7 +109,7 @@ public class BTConnection extends Connection {
         }
     }
 
-    //connect
+    //searchDevices
 
 
     public static void connect() {

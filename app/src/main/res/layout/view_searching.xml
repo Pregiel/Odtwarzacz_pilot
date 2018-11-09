@@ -12,47 +12,47 @@
         android:orientation="vertical"
         android:padding="22dp">
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:text="@string/connect"
-            android:textAlignment="center"
-            android:textSize="30sp"
-            android:textStyle="bold" />
-
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
             android:orientation="horizontal">
 
             <android.support.v7.widget.AppCompatImageButton
-                android:id="@+id/btnWifi"
-                android:layout_width="match_parent"
-                android:layout_height="86dp"
-                android:layout_margin="6dp"
-                android:layout_weight="1"
+                android:id="@+id/search_cancel"
+                android:layout_width="42dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_wifi_circle" />
+                app:srcCompat="@drawable/ic_arrow_back" />
 
-            <android.support.v7.widget.AppCompatImageButton
-                android:id="@+id/btnBt"
+            <TextView
+                android:id="@+id/textView"
                 android:layout_width="match_parent"
-                android:layout_height="86dp"
-                android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_bluetooth_circle" />
-
+                android:layout_height="match_parent"
+                android:layout_marginEnd="48dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="0"
+                android:text="@string/searching_devices"
+                android:textAlignment="center"
+                android:textSize="30sp"
+                android:textStyle="bold" />
         </LinearLayout>
+
+
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="164dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_looking" />
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/recent_connected"
+            android:layout_marginTop="12dp"
+            android:text="@string/founded"
             android:textAlignment="textStart"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -63,7 +63,7 @@
             android:background="@color/separator" />
 
         <ListView
-            android:id="@+id/recentConnected"
+            android:id="@+id/founded_devices"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingTop="6dp" />

@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="24dp"
+        android:height="24dp"
+        android:viewportWidth="24.0"
+        android:viewportHeight="24.0">
+
+    <path
+        android:name="circle"
+        android:fillColor="@color/colorPrimary"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2"/>
+
+    <path
+        android:fillColor="@color/icons"
+        android:pathData="m 4.4842419,10.029931 1.3664994,1.3665 c 3.3957506,-3.3957514 8.9027427,-3.3957514 12.2984927,0 l 1.3665,-1.3665 c -4.147325,-4.1473252 -10.8773343,-4.1473252 -15.0314921,0 z m 5.4659972,5.465997 2.0497479,2.049748 2.04975,-2.049748 c -1.127362,-1.134194 -2.965303,-1.134194 -4.0994979,0 z M 7.2172405,12.76293 8.5837397,14.129429 c 1.8857693,-1.88577 4.9467273,-1.88577 6.8324963,0 l 1.366499,-1.366499 c -2.637344,-2.637344 -6.9213186,-2.637344 -9.5654945,0 z"/>
+</vector>

@@ -6,9 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
-import android.widget.Toast;
 
-import com.pregiel.odtwarzacz_pilot.connection.Connection;
 import com.pregiel.odtwarzacz_pilot.connection.UsbConnection;
 
 //adb shell am broadcast -a com.pregiel.odtwarzacz_pilot.UsbConnectReceiver.ACTION_USB_CONNECT

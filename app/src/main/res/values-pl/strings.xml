@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Odtwarzacz - pilot</string>
+    <string name="connect">Połącz</string>
+    <string name="connected_with">Połączono z %1$s</string>
+    <string name="action_settings">Ustawienia</string>
+    <string name="pilot">Pilot</string>
+    <string name="playlist">Lista odtwarzania</string>
+    <string name="settings">Ustawienia</string>
+    <string name="preview">Podgląd</string>
+    <string name="btn_showplaylist">Pokaż listę odtwarzania</string>
+    <string name="btn_mute">Wycisz/wyłącz wyciszenie</string>
+    <string name="btn_random">Losowo</string>
+    <string name="btn_repeat">Powtórz</string>
+    <string name="btn_vol_up">Podgłoś</string>
+    <string name="btn_volume_down">Przycisz</string>
+    <string name="btn_next">Następny</string>
+    <string name="btn_prev">Poprzedni</string>
+    <string name="btn_play">Odtwórz/pauza</string>
+    <string name="btn_next_randomize">Wylosuj następny plik</string>
+    <string name="recent_connected">Ostatnio połaczone</string>
+</resources>

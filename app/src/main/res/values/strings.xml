@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">Odtwarzacz - pilot</string>
     <string name="connect">Connect</string>
-    <string name="bluetooth">Bluetooth</string>
-    <string name="wifi">Wifi</string>
+    <string name="bluetooth" translatable="false">Bluetooth</string>
+    <string name="wifi" translatable="false">Wifi</string>
     <string name="connected_with">Connected with %1$s</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main" translatable="false">MainActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="section_format" translatable="false">Hello World from section: %1$d</string>
     <string name="pilot">Pilot</string>
     <string name="playlist">Playlist</string>
     <string name="settings">Settings</string>
@@ -22,6 +22,10 @@
     <string name="btn_play">Play/pause</string>
     <string name="btn_next_randomize">Randomize next file</string>
     <string name="img_background_circle" />
-    <string name="internet">Internet</string>
-    <string name="usb">USB</string>
+    <string name="internet" translatable="false">Internet</string>
+    <string name="usb" translatable="false">USB</string>
+    <string name="recent_connected">Recent connected</string>
+    <string name="connecting">Connecting</string>
+    <string name="founded">Founded devices</string>
+    <string name="searching_devices">Searching devices</string>
 </resources>

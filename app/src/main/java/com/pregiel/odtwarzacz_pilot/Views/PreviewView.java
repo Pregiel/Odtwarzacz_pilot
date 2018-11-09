@@ -1,15 +1,12 @@
 package com.pregiel.odtwarzacz_pilot.Views;
 
 
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.R;
-import com.pregiel.odtwarzacz_pilot.connection.Connection;
 
 public class PreviewView {
 

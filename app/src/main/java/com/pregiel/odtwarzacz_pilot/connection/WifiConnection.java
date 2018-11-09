@@ -2,9 +2,6 @@ package com.pregiel.odtwarzacz_pilot.connection;
 
 import android.os.AsyncTask;
 
-import com.pregiel.odtwarzacz_pilot.MainActivity;
-import com.pregiel.odtwarzacz_pilot.Views.PilotView;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -12,7 +9,9 @@ import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 /**
  * Created by Pregiel on 08.04.2018.
@@ -25,7 +24,6 @@ public class WifiConnection extends Connection {
     private final static int TIMEOUT = 200;
 
 
-
     public WifiConnection() {
         socket = null;
     }
@@ -33,44 +31,115 @@ public class WifiConnection extends Connection {
     //main functions
 
 
-    public static void connect() {
-        new LongOperationConnect().execute();
+    public static void searchDevices() {
+        new LongOperationSearch().execute();
     }
 
     public void disconnect() {
-            new LongOperationDisconnect().execute();
+        new LongOperationDisconnect().execute();
     }
 
     //connection
 
-    private static class LongOperationConnect extends AsyncTask<Void, Void, Void> {
+    private static boolean stopSearching;
 
+    public static void stopSearching() {
+        stopSearching = true;
+    }
+
+    private static List<String> founded;
+
+    public static List<String> getFoundedList() {
+        return founded;
+    }
+
+    public static void setFoundedList(List<String> founded) {
+        WifiConnection.founded = founded;
+    }
+
+    private static class LongOperationSearch extends AsyncTask<Void, Void, Void> {
+
+
+        public LongOperationSearch() {
+            founded = new ArrayList<>();
+        }
 
         @Override
         protected Void doInBackground(Void... voids) {
             String ip = getWifiApIpAddress();
+            stopSearching = false;
 
             System.out.println("My ip: " + ip);
 
             String subnet = ip.substring(0, ip.lastIndexOf(".") + 1);
 
-            for (int i = 1; i < 255; i++) {
-                String host = subnet + i;
-                if (isReachableByTcp(host)) {
+            selectedHost = null;
+            while (!stopSearching) {
+                for (int i = 1; i < 255; i++) {
+                    String host = subnet + i;
+                    if (isReachableByTcp(host)) {
+                        if (!founded.contains(host)) {
+                            founded.add(host);
+                            Connection.setFoundedDevicesAdapter(founded);
+                        }
+                        System.out.println("founded: " + host);
 
-                    try {
-                        socket = new Socket(host, 1755);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+//                    try {
+//                        socket = new Socket(host, 1755);
+//                        stopSearching = true;
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+                        break;
+                    } else {
+                        if (founded.contains(host)) {
+                            founded.remove(host);
+                            Connection.setFoundedDevicesAdapter(founded);
+                        }
                     }
-                    break;
+                    if (stopSearching) {
+                        break;
+                    }
                 }
             }
-            setConnected(true);
-            try {
-                setStreams(socket.getInputStream(), socket.getOutputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (selectedHost != null) {
+                try {
+                    socket = new Socket(selectedHost, 1755);
+                    setConnected(true);
+                    setStreams(socket.getInputStream(), socket.getOutputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+    }
+
+    private static String selectedHost;
+
+    public static void connect(String host) {
+        stopSearching = true;
+        selectedHost = host;
+//        new LongOperationConnect(host).execute();
+    }
+
+    private static class LongOperationConnect extends AsyncTask<Void, Void, Void> {
+        private String host;
+
+        public LongOperationConnect(String host) {
+            this.host = host;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (isReachableByTcp(host)) {
+                try {
+                    socket = new Socket(host, 1755);
+                    setConnected(true);
+                    setStreams(socket.getInputStream(), socket.getOutputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             return null;
         }

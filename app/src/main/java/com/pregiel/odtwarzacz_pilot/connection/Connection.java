@@ -2,20 +2,26 @@ package com.pregiel.odtwarzacz_pilot.connection;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatImageButton;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.pregiel.odtwarzacz_pilot.connection.RecentConnected.RecentConnectedAdapter;
+import com.pregiel.odtwarzacz_pilot.connection.RecentConnected.RecentElement;
 import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooser;
 import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.R;
@@ -30,7 +36,9 @@ import java.io.OutputStream;
 import java.io.UTFDataFormatException;
 import java.net.ServerSocket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
@@ -144,11 +152,11 @@ public abstract class Connection {
                 } catch (SocketException | EOFException e) {
                     e.printStackTrace();
                     disconnect();
-                    Connection.showConnectionChooser();
+                    Connection.showConnectionChooser(null);
                 } catch (IOException e) {
                     e.printStackTrace();
                     disconnect();
-                    Connection.showConnectionChooser();
+                    Connection.showConnectionChooser(null);
                 }
 
             }
@@ -187,11 +195,11 @@ public abstract class Connection {
                 } catch (SocketException | EOFException e) {
                     e.printStackTrace();
                     disconnect();
-                    Connection.showConnectionChooser();
+                    Connection.showConnectionChooser(null);
                 } catch (IOException e) {
                     e.printStackTrace();
                     disconnect();
-                    Connection.showConnectionChooser();
+                    Connection.showConnectionChooser(null);
                 }
 
             }
@@ -245,7 +253,7 @@ public abstract class Connection {
     }
 
     public static void sendMessage(Object... messages) {
-        System.out.println(Arrays.toString(messages));
+        System.out.println("sending: " + Arrays.toString(messages));
         if (isConnected()) {
             StringBuilder stringBuilder = new StringBuilder();
             for (Object o : messages) {
@@ -273,7 +281,7 @@ public abstract class Connection {
 
     public static void mediaController(String msg) {
         final String[] message = msg.split(Connection.SEPARATOR);
-        System.out.println(msg);
+        System.out.println("received: " + msg);
         boolean getNextMessage = true;
         switch (message[0]) {
             case TIME:
@@ -460,27 +468,28 @@ public abstract class Connection {
 
     private static PopupWindow popupWindow;
 
-    public static void showConnectionChooser() {
-        LayoutInflater inflater = (LayoutInflater) MainActivity.getInstance().getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+    public static void showConnectionChooser(final ViewGroup container) {
+        final LayoutInflater inflater = (LayoutInflater) MainActivity.getInstance().getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
 
-        final View popupView = inflater.inflate(R.layout.view_choose_connection, null);
+        final View popupView = inflater.inflate(R.layout.view_choose_connection, container, false);
 
         popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-        Button wifiButton = popupView.findViewById(R.id.btnWifi);
-
+        AppCompatImageButton wifiButton = popupView.findViewById(R.id.btnWifi);
         wifiButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
                         ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED) {
-                    WifiConnection.connect();
+                    popupWindow.dismiss();
+                    showSearchDevicesView(0, container);
+                    WifiConnection.searchDevices();
                 }
             }
         });
 
-        Button btButton = popupView.findViewById(R.id.btnBt);
 
+        AppCompatImageButton btButton = popupView.findViewById(R.id.btnBt);
         btButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -496,15 +505,110 @@ public abstract class Connection {
 //            public void onClick(View view) {
 //                if (ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
 //                        ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED) {
-//                    UsbConnection.connect();
+//                    UsbConnection.showSearchDevicesView();
 //                }
 //            }
 //        });
+
+        List<RecentElement> list = new ArrayList<>();
+        list.add(new RecentElement("tak", 1));
+        list.add(new RecentElement("tak21", 0));
+
+        ListView recentConnected = popupView.findViewById(R.id.recentConnected);
+
+        RecentConnectedAdapter adapter = new RecentConnectedAdapter(popupView.getContext(), list);
+
+        recentConnected.setAdapter(adapter);
 
         MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+            }
+        });
+    }
+
+
+    private static ListView foundedDevices;
+    private static Context context;
+
+    private static void showSearchDevicesView(final int type, final ViewGroup container) {
+        final LayoutInflater inflater = (LayoutInflater) MainActivity.getInstance().getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+        final View popupView = inflater.inflate(R.layout.view_searching, container, false);
+
+        context = container.getContext();
+
+
+        popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+        AppCompatImageButton cancel = popupView.findViewById(R.id.search_cancel);
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (type) {
+                    case 0:
+                        WifiConnection.stopSearching();
+                        break;
+
+                    case 1:
+
+                        break;
+                }
+                popupWindow.dismiss();
+                showConnectionChooser(container);
+            }
+        });
+
+        foundedDevices = popupView.findViewById(R.id.founded_devices);
+
+        foundedDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                switch (type) {
+                    case 0:
+                        System.out.println("connecting to: " + foundedDevices.getAdapter().getItem(position).toString());
+                        WifiConnection.connect(foundedDevices.getAdapter().getItem(position).toString());
+                        break;
+
+                    case 1:
+
+                        break;
+                }
+            }
+        });
+
+
+
+//        switch (type) {
+//            case 1:
+//                WifiConnection.setFoundedList(new ArrayList<String>());
+//                adapter = new ArrayAdapter<>(container.getContext(), R.layout.row, WifiConnection.getFoundedList());
+//                break;
+//
+//            default:
+//                adapter = new ArrayAdapter<>(container.getContext(), R.layout.row, WifiConnection.getFoundedList());
+//                break;
+//        }
+//
+//        foundedDevices.setAdapter(adapter);
+
+
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+            }
+        });
+    }
+
+    public static void setFoundedDevicesAdapter(final List<String> values) {
+
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.row, values);
+                foundedDevices.setAdapter(adapter);
             }
         });
     }

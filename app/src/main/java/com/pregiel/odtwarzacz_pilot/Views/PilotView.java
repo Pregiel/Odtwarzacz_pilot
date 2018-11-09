@@ -2,9 +2,7 @@ package com.pregiel.odtwarzacz_pilot.Views;
 
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -12,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -23,7 +20,6 @@ import com.pregiel.odtwarzacz_pilot.Utils;
 import com.pregiel.odtwarzacz_pilot.connection.Connection;
 
 import java.util.Calendar;
-import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -85,7 +81,7 @@ public class PilotView {
         view = inflater.inflate(R.layout.view_pilot, container, false);
 
         if (!Connection.isConnected()) {
-            Connection.showConnectionChooser();
+            Connection.showConnectionChooser(container);
         }
 
         lblFilename = view.findViewById(R.id.lbl_filename);

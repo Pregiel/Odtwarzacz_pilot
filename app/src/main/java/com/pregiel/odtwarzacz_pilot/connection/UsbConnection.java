@@ -3,14 +3,8 @@ package com.pregiel.odtwarzacz_pilot.connection;
 import android.os.AsyncTask;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.SocketException;
-import java.util.Enumeration;
 
 /**
  * Created by Pregiel on 08.04.2018.
