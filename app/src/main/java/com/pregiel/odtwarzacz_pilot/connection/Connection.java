@@ -221,7 +221,8 @@ public abstract class Connection {
         return serverSocket;
     }
 
-    public static void setServerSocket(ServerSocket serverSocket) {
+    public static void setServerSocket(ServerSocket serverSocket) throws SocketException {
+        serverSocket.setReuseAddress(true);
         Connection.serverSocket = serverSocket;
     }
 
@@ -231,7 +232,9 @@ public abstract class Connection {
             MainActivity.getPilotView().getTimer().cancel();
         }
         try {
-            serverSocket.close();
+            if (serverSocket != null) {
+                serverSocket.close();
+            }
             DOS.close();
             DIS.close();
 
@@ -282,7 +285,9 @@ public abstract class Connection {
                         if (!MainActivity.getPilotView().isSendTime()) {
                             MainActivity.getPilotView().getTimeCurrentText().setText(Utils.millisToString(currentTimeMillis));
                             MainActivity.getPilotView().setTime(currentTimeMillis);
-                            MainActivity.getPilotView().getTimeSlider().setProgress((((int) currentTimeMillis * 100) / (int) MainActivity.getPilotView().getTotalTime()));
+                            if ((int) MainActivity.getPilotView().getTotalTime() != 0) {
+                                MainActivity.getPilotView().getTimeSlider().setProgress((((int) currentTimeMillis * 100) / (int) MainActivity.getPilotView().getTotalTime()));
+                            }
                         }
                     }
                 });
@@ -484,17 +489,17 @@ public abstract class Connection {
             }
         });
 
-        Button usbButton = popupView.findViewById(R.id.btnUsb);
-
-        usbButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED) {
-                    UsbConnection.connect();
-                }
-            }
-        });
+//        Button usbButton = popupView.findViewById(R.id.btnUsb);
+//
+//        usbButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
+//                        ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED) {
+//                    UsbConnection.connect();
+//                }
+//            }
+//        });
 
         MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override

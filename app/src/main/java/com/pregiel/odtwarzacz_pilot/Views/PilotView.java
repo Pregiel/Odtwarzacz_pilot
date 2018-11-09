@@ -343,13 +343,15 @@ public class PilotView {
     public void switchPlayButton(int value, double currentTime) {
         switch (value) {
             case 0:
-                playButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.getInstance().getApplicationContext(), R.drawable.ic_pause_circle));
+//                playButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.getInstance().getApplicationContext(), R.drawable.ic_pause_circle));
+                playButton.setImageResource(R.drawable.ic_pause_circle);
                 playing = true;
                 setTime(currentTime);
                 break;
 
             default:
-                playButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.getInstance().getApplicationContext(), R.drawable.ic_play_circle));
+//                playButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.getInstance().getApplicationContext(), R.drawable.ic_play_circle));
+                playButton.setImageResource(R.drawable.ic_play_circle);
                 timer.cancel();
                 playing = false;
         }
