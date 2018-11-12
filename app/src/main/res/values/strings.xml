@@ -28,4 +28,6 @@
     <string name="connecting">Connecting</string>
     <string name="founded">Founded devices</string>
     <string name="searching_devices">Searching devices</string>
+    <string name="connecting_with">Connecting with %1$s</string>
+    <string name="connecting_error">Can\'t connect to %1$s</string>
 </resources>

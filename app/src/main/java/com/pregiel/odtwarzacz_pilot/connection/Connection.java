@@ -3,6 +3,7 @@ package com.pregiel.odtwarzacz_pilot.connection;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,8 +35,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UTFDataFormatException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -104,6 +107,8 @@ public abstract class Connection {
 
     public static final String SEPARATOR = "::";
 
+    public static final String RECENT_CONNECTION_TAG = "RECENT_CONNECTION_TAG";
+
     private static DataInputStream DIS;
     private static DataOutputStream DOS;
 
@@ -152,11 +157,11 @@ public abstract class Connection {
                 } catch (SocketException | EOFException e) {
                     e.printStackTrace();
                     disconnect();
-                    Connection.showConnectionChooser(null);
+                    Connection.showConnectionChooser(container);
                 } catch (IOException e) {
                     e.printStackTrace();
                     disconnect();
-                    Connection.showConnectionChooser(null);
+                    Connection.showConnectionChooser(container);
                 }
 
             }
@@ -195,11 +200,11 @@ public abstract class Connection {
                 } catch (SocketException | EOFException e) {
                     e.printStackTrace();
                     disconnect();
-                    Connection.showConnectionChooser(null);
+                    Connection.showConnectionChooser(container);
                 } catch (IOException e) {
                     e.printStackTrace();
                     disconnect();
-                    Connection.showConnectionChooser(null);
+                    Connection.showConnectionChooser(container);
                 }
 
             }
@@ -363,6 +368,11 @@ public abstract class Connection {
                         Toast.makeText(MainActivity.getPilotView().getView().getContext(), MainActivity.getPilotView().getView().getContext().getString(R.string.connected_with, message[1]), Toast.LENGTH_SHORT).show();
                     }
                 });
+
+                SharedPreferences recentPref = MainActivity.getInstance().getBaseContext().getSharedPreferences(RECENT_CONNECTION_TAG, Context.MODE_PRIVATE);
+                SharedPreferences.Editor recentPrefEditor = recentPref.edit();
+                recentPrefEditor.putString("first_name", message[1]);
+                recentPrefEditor.apply();
                 break;
 
             case FILE_NAME:
@@ -468,8 +478,12 @@ public abstract class Connection {
 
     private static PopupWindow popupWindow;
 
+    private static ViewGroup container;
+
     public static void showConnectionChooser(final ViewGroup container) {
         final LayoutInflater inflater = (LayoutInflater) MainActivity.getInstance().getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+
+        Connection.container = container;
 
         final View popupView = inflater.inflate(R.layout.view_choose_connection, container, false);
 
@@ -479,12 +493,10 @@ public abstract class Connection {
         wifiButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(MainActivity.getInstance().getApplicationContext(), Manifest.permission.ACCESS_WIFI_STATE) == PackageManager.PERMISSION_GRANTED) {
                     popupWindow.dismiss();
                     showSearchDevicesView(0, container);
                     WifiConnection.searchDevices();
-                }
+
             }
         });
 
@@ -511,8 +523,24 @@ public abstract class Connection {
 //        });
 
         List<RecentElement> list = new ArrayList<>();
-        list.add(new RecentElement("tak", 1));
-        list.add(new RecentElement("tak21", 0));
+        list.add(new RecentElement("0.2.3.1.23", "tasd", 1));
+        list.add(new RecentElement("435.312.4423.63.", "taksda", 0));
+
+        SharedPreferences recentPref = MainActivity.getInstance().getBaseContext().getSharedPreferences(RECENT_CONNECTION_TAG, Context.MODE_PRIVATE);
+
+        String first = recentPref.getString("first", "none");
+        if (!first.equals("none")) {
+            String first_name = recentPref.getString("first_name", "none");
+            list.add(new RecentElement(first, first_name, 0));
+
+            String second = recentPref.getString("second", "none");
+            if (!second.equals("none")) {
+                String second_name = recentPref.getString("second_name", "none");
+                list.add(new RecentElement(second, second_name, 0));
+            }
+        }
+
+
 
         ListView recentConnected = popupView.findViewById(R.id.recentConnected);
 
@@ -530,14 +558,13 @@ public abstract class Connection {
 
 
     private static ListView foundedDevices;
-    private static Context context;
+    private static FoundedAdapter foundedAdapter;
 
     private static void showSearchDevicesView(final int type, final ViewGroup container) {
         final LayoutInflater inflater = (LayoutInflater) MainActivity.getInstance().getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
         final View popupView = inflater.inflate(R.layout.view_searching, container, false);
 
-        context = container.getContext();
-
+        WifiConnection.initFoundedList();
 
         popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
@@ -562,36 +589,9 @@ public abstract class Connection {
 
         foundedDevices = popupView.findViewById(R.id.founded_devices);
 
-        foundedDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch (type) {
-                    case 0:
-                        System.out.println("connecting to: " + foundedDevices.getAdapter().getItem(position).toString());
-                        WifiConnection.connect(foundedDevices.getAdapter().getItem(position).toString());
-                        break;
+        foundedAdapter = new FoundedAdapter(popupView.getContext(), WifiConnection.getFoundedList());
 
-                    case 1:
-
-                        break;
-                }
-            }
-        });
-
-
-
-//        switch (type) {
-//            case 1:
-//                WifiConnection.setFoundedList(new ArrayList<String>());
-//                adapter = new ArrayAdapter<>(container.getContext(), R.layout.row, WifiConnection.getFoundedList());
-//                break;
-//
-//            default:
-//                adapter = new ArrayAdapter<>(container.getContext(), R.layout.row, WifiConnection.getFoundedList());
-//                break;
-//        }
-//
-//        foundedDevices.setAdapter(adapter);
+        foundedDevices.setAdapter(foundedAdapter);
 
 
         MainActivity.getInstance().runOnUiThread(new Runnable() {
@@ -602,13 +602,13 @@ public abstract class Connection {
         });
     }
 
-    public static void setFoundedDevicesAdapter(final List<String> values) {
+    public static void setFoundedDevicesAdapter() {
 
         MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.row, values);
-                foundedDevices.setAdapter(adapter);
+                foundedAdapter.notifyDataSetChanged();
+
             }
         });
     }

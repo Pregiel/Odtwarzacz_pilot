@@ -19,4 +19,6 @@
     <string name="btn_play">Odtwórz/pauza</string>
     <string name="btn_next_randomize">Wylosuj następny plik</string>
     <string name="recent_connected">Ostatnio połaczone</string>
+    <string name="connecting_with">Łączę z %1$s</string>
+    <string name="connecting_error">Nie można połączyć się z %1$s</string>
 </resources>

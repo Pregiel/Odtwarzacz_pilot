@@ -5,16 +5,21 @@ public class RecentElement {
     public static final int WIFI_CONNECTION = 0;
     public static final int BT_CONNECTION = 1;
 
-    private String text;
+    private String address, name;
     private int connectionType;
 
-    public RecentElement(String text, int connectionType) {
-        this.text = text;
+    public RecentElement(String address, String name, int connectionType) {
+        this.address = address;
+        this.name = name;
         this.connectionType = connectionType;
     }
 
-    public String getText() {
-        return text;
+    public String getAddress() {
+        return address;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getConnectionType() {
