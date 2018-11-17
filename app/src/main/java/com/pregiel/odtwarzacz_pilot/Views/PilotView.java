@@ -372,7 +372,9 @@ public class PilotView {
                             @Override
                             public void run() {
                                 getTimeCurrentText().setText(Utils.millisToString(time));
-                                getTimeSlider().setProgress((((int) time * 100) / (int) MainActivity.getPilotView().getTotalTime()));
+                                if ((int) MainActivity.getPilotView().getTotalTime() > 0) {
+                                    getTimeSlider().setProgress((((int) time * 100) / (int) MainActivity.getPilotView().getTotalTime()));
+                                }
                                 time = time + 250;
                             }
                         });

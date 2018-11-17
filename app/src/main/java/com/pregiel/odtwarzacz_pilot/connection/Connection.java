@@ -1,22 +1,17 @@
 package com.pregiel.odtwarzacz_pilot.connection;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatImageButton;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
@@ -35,10 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UTFDataFormatException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -81,6 +74,8 @@ public abstract class Connection {
     public static final String PLAYLIST_UPDATE = "PLAYLIST_UPDATE";
     public static final String PLAYLIST_PLAY = "PLAYLIST_PLAY";
     public static final String PLAYLIST_PLAYING_INDEX = "PLAYLIST_PLAYING_INDEX";
+    public static final String PLAYLIST_TITLES = "PLAYLIST_TITLES";
+    public static final String PLAYLIST_TITLE_INDEX = "PLAYLIST_TITLE_INDEX";
 
     public static final String FORWARD_PRESSED = "FORWARD_PRESSED";
     public static final String FORWARD_RELEASED = "FORWARD_RELEASED";
@@ -369,10 +364,13 @@ public abstract class Connection {
                     }
                 });
 
+
                 SharedPreferences recentPref = MainActivity.getInstance().getBaseContext().getSharedPreferences(RECENT_CONNECTION_TAG, Context.MODE_PRIVATE);
                 SharedPreferences.Editor recentPrefEditor = recentPref.edit();
                 recentPrefEditor.putString("first_name", message[1]);
                 recentPrefEditor.apply();
+
+
                 break;
 
             case FILE_NAME:
@@ -432,12 +430,22 @@ public abstract class Connection {
 
             case PLAYLIST_SEND:
                 MainActivity.getPlaylist().makePlaylist(message);
-                MainActivity.getPlaylistView().updateListView();
+                MainActivity.getPlaylistView().updatePlaylist();
                 break;
 
             case PLAYLIST_PLAYING_INDEX:
                 MainActivity.getPlaylist().setPlaylistIndex(Integer.parseInt(message[1]));
-                MainActivity.getPlaylistView().updateListView();
+                MainActivity.getPlaylistView().updatePlaylist();
+                break;
+
+            case PLAYLIST_TITLES:
+                MainActivity.getPlaylist().makePlaylistTitles(message);
+                MainActivity.getPlaylistView().setPlaylistTitle(Integer.parseInt(message[1]));
+                MainActivity.getPlaylistView().updatePlaylistTitles();
+                break;
+
+            case PLAYLIST_TITLE_INDEX:
+                MainActivity.getPlaylistView().setPlaylistTitle(Integer.parseInt(message[1]));
                 break;
 
             case FILECHOOSER_SHOW:
@@ -488,6 +496,7 @@ public abstract class Connection {
         final View popupView = inflater.inflate(R.layout.view_choose_connection, container, false);
 
         popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        popupWindow.setOutsideTouchable(false);
 
         AppCompatImageButton wifiButton = popupView.findViewById(R.id.btnWifi);
         wifiButton.setOnClickListener(new View.OnClickListener() {
@@ -523,8 +532,6 @@ public abstract class Connection {
 //        });
 
         List<RecentElement> list = new ArrayList<>();
-        list.add(new RecentElement("0.2.3.1.23", "tasd", 1));
-        list.add(new RecentElement("435.312.4423.63.", "taksda", 0));
 
         SharedPreferences recentPref = MainActivity.getInstance().getBaseContext().getSharedPreferences(RECENT_CONNECTION_TAG, Context.MODE_PRIVATE);
 
@@ -567,6 +574,7 @@ public abstract class Connection {
         WifiConnection.initFoundedList();
 
         popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        popupWindow.setOutsideTouchable(false);
 
         AppCompatImageButton cancel = popupView.findViewById(R.id.search_cancel);
 

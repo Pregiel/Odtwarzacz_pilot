@@ -37,8 +37,6 @@ public class RecentConnectedAdapter extends ArrayAdapter<RecentElement> {
 
         convertView = LayoutInflater.from(getContext()).inflate(R.layout.element_recentconnect, parent, false);
 
-        final View finalConvertView = convertView;
-
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

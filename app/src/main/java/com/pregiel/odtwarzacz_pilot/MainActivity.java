@@ -99,9 +99,6 @@ public class MainActivity extends AppCompatActivity {
         previewView = new PreviewView();
 
         playlist = new Playlist();
-
-
-
     }
 
     public MyViewPager getmViewPager() {

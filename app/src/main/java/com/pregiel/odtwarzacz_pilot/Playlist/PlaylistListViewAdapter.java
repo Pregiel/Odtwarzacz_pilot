@@ -16,9 +16,9 @@ import com.pregiel.odtwarzacz_pilot.connection.Connection;
 
 import java.util.List;
 
-public class PlaylistListViewAdapter extends ArrayAdapter<String> {
+public class PlaylistListViewAdapter extends ArrayAdapter<PlaylistElement> {
 
-    public PlaylistListViewAdapter(Context context, List<String> playlist) {
+    public PlaylistListViewAdapter(Context context, List<PlaylistElement> playlist) {
         super(context, 0, playlist);
     }
 
@@ -30,14 +30,21 @@ public class PlaylistListViewAdapter extends ArrayAdapter<String> {
 
 
         TextView nameText = convertView.findViewById(R.id.nameText);
+        TextView durationText = convertView.findViewById(R.id.durationText);
 
-        String[] name = MainActivity.getPlaylist().getPlaylist().get(position).split("\\\\");
+//        String[] name = MainActivity.getPlaylist().getPlaylist().get(position).split("\\\\");
+        String name = MainActivity.getPlaylist().getPlaylist().get(position).getTitle();
 
-        nameText.setText(name[name.length - 1]);
+//        nameText.setText(name[name.length - 1]);
+        nameText.setText(name);
 
+
+        String duration = MainActivity.getPlaylist().getPlaylist().get(position).getDuration();
+        durationText.setText(duration);
 
         if (MainActivity.getPlaylist().getPlaylistIndex() == position + 1) {
             nameText.setTextColor(getContext().getResources().getColor(R.color.colorAccent));
+            durationText.setTextColor(getContext().getResources().getColor(R.color.colorAccent));
         }
 
         nameText.setOnClickListener(new View.OnClickListener() {

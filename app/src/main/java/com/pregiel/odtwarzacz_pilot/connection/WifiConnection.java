@@ -187,8 +187,11 @@ public class WifiConnection extends Connection {
 
                 String first = recentPref.getString("first", "none");
                 if (!first.equals("none")) {
-                    recentPrefEditor.putString("second", first);
-                    recentPrefEditor.putString("second_name", first);
+                    if (!first.equals(selectedHost)) {
+                        String first_name = recentPref.getString("first_name", "none");
+                        recentPrefEditor.putString("second", first);
+                        recentPrefEditor.putString("second_name", first_name);
+                    }
                 }
 
                 recentPrefEditor.putString("first", selectedHost);
