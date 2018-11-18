@@ -41,4 +41,7 @@
         <item>New Zealand</item>
         <item>India</item>
     </string-array>
+    <string name="player_nofilechoosen">No chosen file</string>
+    <string name="recent_files">Recent files</string>
+    <string name="open">Open</string>
 </resources>

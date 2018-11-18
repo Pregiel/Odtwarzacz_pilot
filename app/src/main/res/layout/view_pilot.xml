@@ -1,357 +1,432 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <ImageButton
-        android:id="@+id/btn_playlist"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:contentDescription="@string/btn_showplaylist"
-        app:layout_constraintEnd_toStartOf="@+id/btn_mute"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_playlist" />
 
-    <ImageButton
-        android:id="@+id/btn_mute"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/btn_mute"
-        android:tint="@color/icons_dark"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_playlist"
-        app:layout_constraintEnd_toStartOf="@+id/btn_random"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btn_playlist"
-        app:layout_constraintTop_toTopOf="@+id/btn_playlist"
-        app:srcCompat="@drawable/ic_vol_mute" />
-
-    <ImageButton
-        android:id="@+id/btn_repeat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/btn_repeat"
-        android:tint="@color/icons_dark"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_playlist"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btn_random"
-        app:layout_constraintTop_toTopOf="@+id/btn_playlist"
-        app:srcCompat="@drawable/ic_repeat" />
-
-    <ImageButton
-        android:id="@+id/btn_random"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/btn_random"
-        android:tint="@color/icons_dark"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_playlist"
-        app:layout_constraintEnd_toStartOf="@+id/btn_repeat"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btn_mute"
-        app:layout_constraintTop_toTopOf="@+id/btn_playlist"
-        app:srcCompat="@drawable/ic_shuffle" />
-
-    <LinearLayout
-        android:id="@+id/infoBar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/nextBar"
-        android:layout_marginBottom="16dp"
-        android:orientation="vertical"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        app:layout_constraintBottom_toTopOf="@+id/nextBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            android:id="@+id/lbl_filename"
-            android:layout_width="match_parent"
+        <ImageButton
+            android:id="@+id/btn_menu"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="File name"
-            android:textAlignment="center"
-            android:textColor="@color/primary_text"
-            android:textSize="18sp" />
+            android:layout_marginTop="32dp"
+            android:contentDescription="@string/btn_showplaylist"
+            app:layout_constraintEnd_toStartOf="@+id/btn_mute"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_playlist" />
 
-        <TextView
-            android:id="@+id/lbl_author"
-            android:layout_width="match_parent"
+        <ImageButton
+            android:id="@+id/btn_mute"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Author"
-            android:textAlignment="center" />
+            android:layout_marginTop="8dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/btn_mute"
+            android:tint="@color/icons_dark"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_menu"
+            app:layout_constraintEnd_toStartOf="@+id/btn_random"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_menu"
+            app:layout_constraintTop_toTopOf="@+id/btn_menu"
+            app:srcCompat="@drawable/ic_vol_mute" />
+
+        <ImageButton
+            android:id="@+id/btn_repeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/btn_repeat"
+            android:tint="@color/icons_dark"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_menu"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_random"
+            app:layout_constraintTop_toTopOf="@+id/btn_menu"
+            app:srcCompat="@drawable/ic_repeat" />
+
+        <ImageButton
+            android:id="@+id/btn_random"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/btn_random"
+            android:tint="@color/icons_dark"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_menu"
+            app:layout_constraintEnd_toStartOf="@+id/btn_repeat"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_mute"
+            app:layout_constraintTop_toTopOf="@+id/btn_menu"
+            app:srcCompat="@drawable/ic_shuffle" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/lbl_time_current"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="00:25"
-                android:textAlignment="textStart"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/lbl_time_total"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="03:24"
-                android:textAlignment="textEnd"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <SeekBar
-            android:id="@+id/slider_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/nextBar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/colorPrimaryDark"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:paddingBottom="3dp"
+            android:id="@+id/infoBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/nextBar"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:paddingTop="3dp"
-            android:text="Next"
-            android:textColor="@color/text_light"
-            android:textSize="12sp"
-            android:textStyle="bold" />
+            app:layout_constraintBottom_toTopOf="@+id/nextBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/colorPrimary"
-            android:orientation="horizontal"
-            android:paddingBottom="5dp"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:paddingTop="5dp">
+            <TextView
+                android:id="@+id/lbl_filename"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/player_nofilechoosen"
+                android:textAlignment="center"
+                android:textColor="@color/primary_text"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/lbl_author"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center" />
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/lbl_next_filename"
-                    android:layout_width="match_parent"
+                    android:id="@+id/lbl_time_current"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="File name"
-                    android:textColor="@color/text_light"
-                    android:textStyle="bold" />
+                    android:layout_weight="1"
+                    android:text="00:25"
+                    android:textAlignment="textStart"
+                    android:textSize="12sp" />
 
                 <TextView
-                    android:id="@+id/lbl_next_author"
-                    android:layout_width="match_parent"
+                    android:id="@+id/lbl_time_total"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Author"
-                    android:textColor="@color/text_light" />
+                    android:layout_weight="1"
+                    android:text="03:24"
+                    android:textAlignment="textEnd"
+                    android:textSize="12sp" />
             </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/btn_reroll"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:contentDescription="@string/btn_next_randomize"
-                android:scaleType="centerInside"
-                android:tint="@color/preview_button"
-                app:srcCompat="@drawable/ic_next_random" />
+            <SeekBar
+                android:id="@+id/slider_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
-    </LinearLayout>
 
-    <ImageView
-        android:id="@+id/circle_vol_down"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:contentDescription="@string/img_background_circle"
-        android:tint="@color/icons_press"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/infoBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_playlist"
-        app:srcCompat="@drawable/ic_circle_quarter" />
+        <LinearLayout
+            android:id="@+id/nextBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorPrimaryDark"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
-    <ImageView
-        android:id="@+id/circle_vol_up"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:contentDescription="@string/img_background_circle"
-        android:rotation="180"
-        android:tint="@color/icons_press"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/infoBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_playlist"
-        app:srcCompat="@drawable/ic_circle_quarter" />
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingBottom="3dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="3dp"
+                android:text="Next"
+                android:textColor="@color/text_light"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-    <ImageView
-        android:id="@+id/circle_prev"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:contentDescription="@string/img_background_circle"
-        android:rotation="90"
-        android:tint="@color/icons_press"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/infoBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_playlist"
-        app:srcCompat="@drawable/ic_circle_quarter" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:orientation="horizontal"
+                android:paddingBottom="5dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="5dp">
 
-    <ImageView
-        android:id="@+id/circle_next"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:contentDescription="@string/img_background_circle"
-        android:rotation="270"
-        android:tint="@color/icons_press"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/infoBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_playlist"
-        app:srcCompat="@drawable/ic_circle_quarter" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/image_circle"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:contentDescription="@string/img_background_circle"
-        android:tint="@color/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@+id/infoBar"
-        app:layout_constraintDimensionRatio="12:9"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_playlist"
-        app:srcCompat="@drawable/ic_circle" />
+                    <TextView
+                        android:id="@+id/lbl_next_filename"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="File name"
+                        android:textColor="@color/text_light"
+                        android:textStyle="bold" />
 
-    <ImageButton
-        android:id="@+id/btn_vol_down"
-        android:layout_width="46dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="24dp"
-        android:contentDescription="@string/btn_volume_down"
-        android:tint="@color/colorPrimary"
-        app:layout_constraintDimensionRatio="h,1:1"
-        app:layout_constraintEnd_toEndOf="@+id/btn_play"
-        app:layout_constraintStart_toStartOf="@+id/btn_play"
-        app:layout_constraintTop_toBottomOf="@+id/btn_play"
-        app:srcCompat="@drawable/ic_vol_down" />
+                    <TextView
+                        android:id="@+id/lbl_next_author"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Author"
+                        android:textColor="@color/text_light" />
+                </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/btn_vol_up"
-        android:layout_width="46dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="24dp"
-        android:contentDescription="@string/btn_vol_up"
-        android:tint="@color/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@+id/btn_play"
-        app:layout_constraintDimensionRatio="h,1:1"
-        app:layout_constraintEnd_toEndOf="@+id/btn_play"
-        app:layout_constraintStart_toStartOf="@+id/btn_play"
-        app:srcCompat="@drawable/ic_vol_up" />
-
-    <ImageButton
-        android:id="@+id/btn_prev"
-        android:layout_width="46dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="24dp"
-        android:contentDescription="@string/btn_prev"
-        android:tint="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_play"
-        app:layout_constraintDimensionRatio="h,1:1"
-        app:layout_constraintEnd_toStartOf="@+id/btn_play"
-        app:layout_constraintTop_toTopOf="@+id/btn_play"
-        app:srcCompat="@drawable/ic_previous" />
-
-    <ImageButton
-        android:id="@+id/btn_next"
-        android:layout_width="46dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="24dp"
-        android:contentDescription="@string/btn_next"
-        android:tint="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_play"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintStart_toEndOf="@+id/btn_play"
-        app:layout_constraintTop_toTopOf="@+id/btn_play"
-        app:srcCompat="@drawable/ic_next" />
-
-    <ImageButton
-        android:id="@+id/btn_play"
-        android:layout_width="80dp"
-        android:layout_height="0dp"
-        android:contentDescription="@string/btn_play"
-        android:onClick="testFunc"
-        app:layout_constraintBottom_toBottomOf="@+id/image_circle"
-        app:layout_constraintDimensionRatio="w,1:1"
-        app:layout_constraintEnd_toEndOf="@+id/image_circle"
-        app:layout_constraintStart_toStartOf="@+id/image_circle"
-        app:layout_constraintTop_toTopOf="@+id/image_circle"
-        app:srcCompat="@drawable/ic_play_circle" />
-
-    <RelativeLayout
-        android:id="@+id/previewLayout"
-        android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+                <ImageButton
+                    android:id="@+id/btn_reroll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:contentDescription="@string/btn_next_randomize"
+                    android:scaleType="centerInside"
+                    android:tint="@color/preview_button"
+                    app:srcCompat="@drawable/ic_next_random" />
+            </LinearLayout>
+        </LinearLayout>
 
         <ImageView
-            android:id="@+id/image_preview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            app:srcCompat="@drawable/ic_launcher_background" />
-    </RelativeLayout>
+            android:id="@+id/circle_vol_down"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/img_background_circle"
+            android:tint="@color/icons_press"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/infoBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_menu"
+            app:srcCompat="@drawable/ic_circle_quarter" />
 
-</android.support.constraint.ConstraintLayout>
+        <ImageView
+            android:id="@+id/circle_vol_up"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/img_background_circle"
+            android:rotation="180"
+            android:tint="@color/icons_press"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/infoBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_menu"
+            app:srcCompat="@drawable/ic_circle_quarter" />
+
+        <ImageView
+            android:id="@+id/circle_prev"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/img_background_circle"
+            android:rotation="90"
+            android:tint="@color/icons_press"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/infoBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_menu"
+            app:srcCompat="@drawable/ic_circle_quarter" />
+
+        <ImageView
+            android:id="@+id/circle_next"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/img_background_circle"
+            android:rotation="270"
+            android:tint="@color/icons_press"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/infoBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_menu"
+            app:srcCompat="@drawable/ic_circle_quarter" />
+
+        <ImageView
+            android:id="@+id/image_circle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/img_background_circle"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toTopOf="@+id/infoBar"
+            app:layout_constraintDimensionRatio="12:9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_menu"
+            app:srcCompat="@drawable/ic_circle" />
+
+        <ImageButton
+            android:id="@+id/btn_vol_down"
+            android:layout_width="46dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="24dp"
+            android:contentDescription="@string/btn_volume_down"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintDimensionRatio="h,1:1"
+            app:layout_constraintEnd_toEndOf="@+id/btn_play"
+            app:layout_constraintStart_toStartOf="@+id/btn_play"
+            app:layout_constraintTop_toBottomOf="@+id/btn_play"
+            app:srcCompat="@drawable/ic_vol_down" />
+
+        <ImageButton
+            android:id="@+id/btn_vol_up"
+            android:layout_width="46dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="24dp"
+            android:contentDescription="@string/btn_vol_up"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toTopOf="@+id/btn_play"
+            app:layout_constraintDimensionRatio="h,1:1"
+            app:layout_constraintEnd_toEndOf="@+id/btn_play"
+            app:layout_constraintStart_toStartOf="@+id/btn_play"
+            app:srcCompat="@drawable/ic_vol_up" />
+
+        <ImageButton
+            android:id="@+id/btn_prev"
+            android:layout_width="46dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="24dp"
+            android:contentDescription="@string/btn_prev"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_play"
+            app:layout_constraintDimensionRatio="h,1:1"
+            app:layout_constraintEnd_toStartOf="@+id/btn_play"
+            app:layout_constraintTop_toTopOf="@+id/btn_play"
+            app:srcCompat="@drawable/ic_previous" />
+
+        <ImageButton
+            android:id="@+id/btn_next"
+            android:layout_width="46dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="24dp"
+            android:contentDescription="@string/btn_next"
+            android:tint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_play"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toEndOf="@+id/btn_play"
+            app:layout_constraintTop_toTopOf="@+id/btn_play"
+            app:srcCompat="@drawable/ic_next" />
+
+        <ImageButton
+            android:id="@+id/btn_play"
+            android:layout_width="80dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/btn_play"
+            android:onClick="testFunc"
+            app:layout_constraintBottom_toBottomOf="@+id/image_circle"
+            app:layout_constraintDimensionRatio="w,1:1"
+            app:layout_constraintEnd_toEndOf="@+id/image_circle"
+            app:layout_constraintStart_toStartOf="@+id/image_circle"
+            app:layout_constraintTop_toTopOf="@+id/image_circle"
+            app:srcCompat="@drawable/ic_play_circle" />
+
+        <RelativeLayout
+            android:id="@+id/previewLayout"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/image_preview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                app:srcCompat="@drawable/ic_launcher_background" />
+        </RelativeLayout>
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/recent_files_window"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:color/background_light"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/recent_files"
+            android:textAlignment="center"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ListView
+            android:id="@+id/recentFileList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:paddingBottom="16dp"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:paddingTop="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/buttons"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        </ListView>
+
+        <LinearLayout
+            android:id="@+id/buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <Button
+                android:id="@+id/btn_open"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/open"/>
+
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="Button" />
+        </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
+</FrameLayout>

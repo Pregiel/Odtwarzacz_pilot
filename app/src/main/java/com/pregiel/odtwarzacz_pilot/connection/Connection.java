@@ -66,6 +66,7 @@ public abstract class Connection {
     public static final String DEVICE_NAME = "DEVICE_NAME";
     public static final String FILE_NAME = "FILE_NAME";
     public static final String NEXT_FILE = "NEXT_FILE";
+    public static final String RECENT_FILES = "RECENT_FILES";
 
     public static final String TIMESLIDER_START = "TIMESLIDER_START";
     public static final String TIMESLIDER_STOP = "TIMESLIDER_STOP";
@@ -91,14 +92,17 @@ public abstract class Connection {
     public static final String VOLUME_DOWN_RELEASED = "VOLUME_DOWN_RELEASED";
     public static final String VOLUME_DOWN_CLICKED = "VOLUME_DOWN_CLICKED";
 
+    public static final String FILECHOOSER_SHOW_PLAYLIST = "FILECHOOSER_SHOW_PLAYLIST";
+    public static final String FILECHOOSER_SHOW_OPEN = "FILECHOOSER_SHOW_OPEN";
     public static final String FILECHOOSER_DIRECTORY_TREE = "FILECHOOSER_DIRECTORY_TREE";
-    public static final String FILECHOOSER_SHOW = "FILECHOOSER_SHOW";
     public static final String FILECHOOSER_DRIVE_LIST = "FILECHOOSER_DRIVE_LIST";
     public static final String FILECHOOSER_PLAY = "FILECHOOSER_PLAY";
     public static final String FILECHOOSER_PLAYLIST_ADD = "FILECHOOSER_PLAYLIST_ADD";
 
     public static final String SNAPSHOT = "SNAPSHOT";
     public static final String SNAPSHOT_REQUEST = "SNAPSHOT_REQUEST";
+
+    public static final String NOTHING_PLAYING = "NOTHING_PLAYING";
 
     public static final String SEPARATOR = "::";
 
@@ -380,6 +384,8 @@ public abstract class Connection {
                         MainActivity.getPilotView().getLblFilename().setText(message[1]);
 
                         MainActivity.getPilotView().getLblAuthor().setText(message.length > 2 ? message[2] : "");
+
+                        MainActivity.getPilotView().noChosenFile(false);
                     }
                 });
                 break;
@@ -428,6 +434,10 @@ public abstract class Connection {
                 });
                 break;
 
+            case RECENT_FILES:
+                MainActivity.getPilotView().setRecentFiles(message);
+                break;
+
             case PLAYLIST_SEND:
                 MainActivity.getPlaylist().makePlaylist(message);
                 MainActivity.getPlaylistView().updatePlaylist();
@@ -448,21 +458,43 @@ public abstract class Connection {
                 MainActivity.getPlaylistView().setPlaylistTitle(Integer.parseInt(message[1]));
                 break;
 
-            case FILECHOOSER_SHOW:
+//            case FILECHOOSER_SHOW:
+//                MainActivity.getInstance().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        desktopFileChooser = new DesktopFileChooser(MainActivity.getInstance(), DesktopFileChooser.makeListFromMessage(message), true, FILECHOOSER_PLAYLIST_ADD);
+//                        desktopFileChooser.showDialog();
+//                    }
+//                });
+//                break;
+
+
+            case FILECHOOSER_SHOW_PLAYLIST:
                 MainActivity.getInstance().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        desktopFileChooser = new DesktopFileChooser(MainActivity.getInstance(), Utils.makeListFromMessage(message));
+                        desktopFileChooser = new DesktopFileChooser(MainActivity.getInstance(), DesktopFileChooser.makeListFromMessage(message), true, FILECHOOSER_PLAYLIST_ADD);
+                        desktopFileChooser.showDialog();
+                    }
+                });
+                break;
+
+
+            case FILECHOOSER_SHOW_OPEN:
+                MainActivity.getInstance().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        desktopFileChooser = new DesktopFileChooser(MainActivity.getInstance(), DesktopFileChooser.makeListFromMessage(message), false, FILE_NAME);
                         desktopFileChooser.showDialog();
                     }
                 });
                 break;
 
             case FILECHOOSER_DIRECTORY_TREE:
-                desktopFileChooser.setList(Utils.makeListFromMessage(message));
+                desktopFileChooser.setTreeItemsList(DesktopFileChooser.makeListFromMessage(message));
                 break;
             case FILECHOOSER_DRIVE_LIST:
-                desktopFileChooser.setList(Utils.makeListFromMessage(message));
+                desktopFileChooser.setTreeItemsList(DesktopFileChooser.makeListFromMessage(message));
                 break;
 
             case SNAPSHOT:
@@ -475,6 +507,10 @@ public abstract class Connection {
 //                System.out.println("SNAPSHOT " + message[1] + " " + message[2] + " " + Calendar.getInstance().getTimeInMillis());
                 break;
 
+            case NOTHING_PLAYING:
+                MainActivity.getPilotView().noChosenFile(true);
+                MainActivity.getPlaylist().setPlaylistIndex(-1);
+                break;
         }
 
         if (getNextMessage) {
@@ -502,9 +538,9 @@ public abstract class Connection {
         wifiButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    popupWindow.dismiss();
-                    showSearchDevicesView(0, container);
-                    WifiConnection.searchDevices();
+                popupWindow.dismiss();
+                showSearchDevicesView(0, container);
+                WifiConnection.searchDevices();
 
             }
         });
@@ -546,7 +582,6 @@ public abstract class Connection {
                 list.add(new RecentElement(second, second_name, 0));
             }
         }
-
 
 
         ListView recentConnected = popupView.findViewById(R.id.recentConnected);

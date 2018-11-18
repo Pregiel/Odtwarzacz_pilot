@@ -3,25 +3,39 @@ package com.pregiel.odtwarzacz_pilot.Views;
 
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooser;
 import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.R;
+import com.pregiel.odtwarzacz_pilot.RecentFilesAdapter;
 import com.pregiel.odtwarzacz_pilot.Utils;
 import com.pregiel.odtwarzacz_pilot.connection.Connection;
+import com.pregiel.odtwarzacz_pilot.connection.WifiConnection;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class PilotView {
 //    private static Connection connection;
@@ -76,8 +90,11 @@ public class PilotView {
 
     private double totalTime;
 
+    private List<String> recentFilesList;
+    private RecentFilesAdapter recentFilesAdapter;
+
     @SuppressLint("ClickableViewAccessibility")
-    public View makeView(LayoutInflater inflater, ViewGroup container) {
+    public View makeView(LayoutInflater inflater, final ViewGroup container) {
         view = inflater.inflate(R.layout.view_pilot, container, false);
 
         if (!Connection.isConnected()) {
@@ -203,6 +220,39 @@ public class PilotView {
             @Override
             public void onClick(View v) {
                 Connection.sendMessage(Connection.REROLL);
+            }
+        });
+
+
+        ImageButton menuButton = view.findViewById(R.id.btn_menu);
+        menuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ConstraintLayout recentWindow = view.findViewById(R.id.recent_files_window);
+                recentWindow.setVisibility(recentWindow.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+            }
+        });
+
+
+        recentFilesList = new ArrayList<>();
+
+        ListView recentFilesListView = view.findViewById(R.id.recentFileList);
+        recentFilesAdapter = new RecentFilesAdapter(view.getContext(), recentFilesList);
+
+        recentFilesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Connection.sendMessage(Connection.FILE_NAME, recentFilesList.get(position));
+            }
+        });
+
+        recentFilesListView.setAdapter(recentFilesAdapter);
+
+        Button openButton = view.findViewById(R.id.btn_open);
+        openButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Connection.sendMessage(Connection.FILECHOOSER_SHOW_OPEN);
             }
         });
 
@@ -382,6 +432,51 @@ public class PilotView {
                 }
             }, (long) (currentTime % 250), 250);
         }
+    }
+
+    public void noChosenFile(boolean value) {
+        final ConstraintLayout recentWindow = view.findViewById(R.id.recent_files_window);
+        if (value) {
+            MainActivity.getInstance().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    lblFilename.setText(R.string.player_nofilechoosen);
+                    lblAuthor.setText(null);
+                    nextBar.setVisibility(View.GONE);
+                    recentWindow.setVisibility(View.VISIBLE);
+                }
+            });
+
+            if (timer != null) {
+                timer.cancel();
+                timer.purge();
+            }
+
+            playing = false;
+
+        } else {
+            MainActivity.getInstance().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    recentWindow.setVisibility(View.GONE);
+                }
+            });
+
+        }
+    }
+
+    public void setRecentFiles(String[] message) {
+        recentFilesList.clear();
+        for (int i = 1; i < message.length; i++) {
+            recentFilesList.add(message[i]);
+        }
+
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                recentFilesAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }
 

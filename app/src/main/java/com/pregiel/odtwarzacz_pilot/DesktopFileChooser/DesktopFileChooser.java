@@ -4,15 +4,20 @@ package com.pregiel.odtwarzacz_pilot.DesktopFileChooser;
 import android.app.Activity;
 import android.app.Dialog;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.R;
+import com.pregiel.odtwarzacz_pilot.Utils;
 import com.pregiel.odtwarzacz_pilot.connection.Connection;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DesktopFileChooser {
@@ -25,11 +30,16 @@ public class DesktopFileChooser {
 
     private String currentDirectory;
 
-    private List<DesktopFileChooserItem> list;
+    private boolean multiSelect;
 
-    public DesktopFileChooser(Activity activity2, List<DesktopFileChooserItem> list2) {
+    private List<DesktopFileChooserItem> treeItemsList;
+    private List<String> selectedItemsList;
+
+    public DesktopFileChooser(Activity activity2, List<DesktopFileChooserItem> list2, boolean multiSelect, final String okMessage) {
         this.activity = activity2;
-        this.list = list2;
+        this.treeItemsList = list2;
+        this.multiSelect = multiSelect;
+        this.selectedItemsList = new ArrayList<>();
 
         dialog = new Dialog(activity);
 
@@ -50,14 +60,35 @@ public class DesktopFileChooser {
 
             }
         });
+
+        Button okButton = view.findViewById(R.id.btn_ok);
+        Button cancelButton = view.findViewById(R.id.btn_cancel);
+
+        okButton.setEnabled(false);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedItemsList.size() > 0) {
+                    Connection.sendMessage(okMessage, makeMessageFromList(selectedItemsList));
+                }
+                dialog.dismiss();
+            }
+        });
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
         currentDirectory = DRIVES;
 
         refreshDialog();
 
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         dialog.setContentView(view);
-
-
     }
 
     private String getPreviousDirectory() {
@@ -72,8 +103,8 @@ public class DesktopFileChooser {
         dialog.show();
     }
 
-    public void setList(List<DesktopFileChooserItem> list) {
-        this.list = list;
+    public void setTreeItemsList(List<DesktopFileChooserItem> treeItemsList) {
+        this.treeItemsList = treeItemsList;
         MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -83,11 +114,10 @@ public class DesktopFileChooser {
     }
 
     private void refreshDialog() {
-
-
         final ListView listView = view.findViewById(R.id.listView);
+        final Button okButton = view.findViewById(R.id.btn_ok);
 
-        DesktopFileChooserAdapter adapter = new DesktopFileChooserAdapter(activity, list);
+        DesktopFileChooserAdapter adapter = new DesktopFileChooserAdapter(activity, treeItemsList, selectedItemsList);
 
         TextView currentPath = view.findViewById(R.id.txtCurrentPath);
 
@@ -99,15 +129,32 @@ public class DesktopFileChooser {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                System.out.println(list.get(i).getPath());
-                if (list.get(i).isDirectory()) {
-                    openDirectory(list.get(i).getPath());
+                DesktopFileChooserItem item = treeItemsList.get(i);
+                System.out.println(item.getPath());
+
+                if (item.isDirectory()) {
+                    openDirectory(item.getPath());
                 } else {
-                    Connection.sendMessage(Connection.FILECHOOSER_PLAYLIST_ADD, list.get(i).getPath());
-                    dialog.dismiss();
+                    if (selectedItemsList.contains(item.getPath())) {
+                        selectedItemsList.remove(item.getPath());
+                        adapterView.getChildAt(i).setBackgroundColor(view.getResources().getColor(R.color.background));
+                    } else {
+                        if (!multiSelect) {
+                            selectedItemsList.clear();
+                        }
+                        selectedItemsList.add(item.getPath());
+                        adapterView.getChildAt(i).setBackgroundColor(view.getResources().getColor(R.color.item_selected));
+                    }
+
+                    if (selectedItemsList.size() > 0) {
+                        okButton.setEnabled(true);
+                    } else {
+                        okButton.setEnabled(false);
+                    }
                 }
             }
         });
+
 
     }
 
@@ -123,5 +170,36 @@ public class DesktopFileChooser {
 
     private String getExtension(String path) {
         return path.substring(path.lastIndexOf("."));
+    }
+
+
+    public static List<DesktopFileChooserItem> makeListFromMessage(String[] message) {
+        List<DesktopFileChooserItem> dirs = new ArrayList<>();
+        List<DesktopFileChooserItem> files = new ArrayList<>();
+
+        for (int i = 1; i < message.length; i++) {
+            if (Utils.isFile(message[i])) {
+                if (Arrays.asList(MainActivity.SUPPORTED_AUDIO).contains(Utils.getExtension(message[i]).toUpperCase()) ||
+                        Arrays.asList(MainActivity.SUPPORTED_VIDEO).contains(Utils.getExtension(message[i]).toUpperCase())) {
+                    files.add(new DesktopFileChooserItem(message[i]));
+                }
+            } else {
+                dirs.add(new DesktopFileChooserItem(message[i]));
+            }
+        }
+
+        List<DesktopFileChooserItem> list = new ArrayList<>();
+        list.addAll(dirs);
+        list.addAll(files);
+
+        return list;
+    }
+
+    public static String makeMessageFromList(List<String> list) {
+        StringBuilder message = new StringBuilder();
+        for (String item : list) {
+            message.append(item).append(Connection.SEPARATOR);
+        }
+        return message.toString();
     }
 }

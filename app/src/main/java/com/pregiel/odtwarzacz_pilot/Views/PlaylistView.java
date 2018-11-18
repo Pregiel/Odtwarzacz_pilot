@@ -63,7 +63,7 @@ public class PlaylistView {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Connection.sendMessage(Connection.FILECHOOSER_SHOW);
+                Connection.sendMessage(Connection.FILECHOOSER_SHOW_PLAYLIST);
             }
         });
 

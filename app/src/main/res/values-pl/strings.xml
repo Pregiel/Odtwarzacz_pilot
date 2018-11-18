@@ -21,4 +21,7 @@
     <string name="recent_connected">Ostatnio połaczone</string>
     <string name="connecting_with">Łączę z %1$s</string>
     <string name="connecting_error">Nie można połączyć się z %1$s</string>
+    <string name="player_nofilechoosen">Nie wybrano pliku</string>
+    <string name="recent_files">Ostatnio wybierane</string>
+    <string name="open">Otwórz</string>
 </resources>
