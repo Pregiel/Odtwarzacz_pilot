@@ -1,10 +1,14 @@
 package com.pregiel.odtwarzacz_pilot.connection;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v7.widget.AppCompatImageButton;
@@ -16,6 +20,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import com.pregiel.odtwarzacz_pilot.Playlist.PlaylistAlreadyExistView;
 import com.pregiel.odtwarzacz_pilot.connection.RecentConnected.RecentConnectedAdapter;
 import com.pregiel.odtwarzacz_pilot.connection.RecentConnected.RecentElement;
 import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooser;
@@ -77,6 +82,15 @@ public abstract class Connection {
     public static final String PLAYLIST_PLAYING_INDEX = "PLAYLIST_PLAYING_INDEX";
     public static final String PLAYLIST_TITLES = "PLAYLIST_TITLES";
     public static final String PLAYLIST_TITLE_INDEX = "PLAYLIST_TITLE_INDEX";
+    public static final String PLAYLIST_PROPERTIES = "PLAYLIST_PROPERTIES";
+    public static final String PLAYLIST_REMOVE = "PLAYLIST_REMOVE";
+    public static final String PLAYLIST_ENABLE = "PLAYLIST_ENABLE";
+
+    public static final String QUEUE_SEND = "QUEUE_SEND";
+    public static final String QUEUE_ADD = "QUEUE_ADD";
+    public static final String QUEUE_REMOVE = "QUEUE_REMOVE";
+    public static final String QUEUE_REMOVE_INDEX = "QUEUE_REMOVE_INDEX";
+    public static final String QUEUE_CLEAR = "QUEUE_CLEAR";
 
     public static final String FORWARD_PRESSED = "FORWARD_PRESSED";
     public static final String FORWARD_RELEASED = "FORWARD_RELEASED";
@@ -98,6 +112,7 @@ public abstract class Connection {
     public static final String FILECHOOSER_DRIVE_LIST = "FILECHOOSER_DRIVE_LIST";
     public static final String FILECHOOSER_PLAY = "FILECHOOSER_PLAY";
     public static final String FILECHOOSER_PLAYLIST_ADD = "FILECHOOSER_PLAYLIST_ADD";
+    public static final String FILECHOOSER_PLAYLIST_ADD_ALREADYEXIST = "FILECHOOSER_PLAYLIST_ADD_ALREADYEXIST";
 
     public static final String SNAPSHOT = "SNAPSHOT";
     public static final String SNAPSHOT_REQUEST = "SNAPSHOT_REQUEST";
@@ -113,6 +128,8 @@ public abstract class Connection {
 
 
     private static boolean connected = false;
+
+    private static PlaylistAlreadyExistView playlistAlreadyExistView;
 
 
     public static boolean isConnected() {
@@ -131,6 +148,12 @@ public abstract class Connection {
             @Override
             public void run() {
                 popupWindow.dismiss();
+            }
+        });
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                playlistAlreadyExistView = new PlaylistAlreadyExistView(MainActivity.getInstance());
             }
         });
 //        view.setConnection();
@@ -324,16 +347,7 @@ public abstract class Connection {
                 break;
 
             case VOLUME:
-                final double volumeValue = Double.parseDouble(message[1]) * 100;
-
-//                final SeekBar volumeSlider = MainActivity.getPilotView().getView().findViewById(R.id.volumeSlider);
-
-//                ((Activity) MainActivity.getPilotView().getView().getContext()).runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        volumeSlider.setProgress((int) volumeValue);
-//                    }
-//                });
+                MainActivity.getPilotView().showVolumeLabel(message[1]);
                 break;
 
             case MUTE_ON:
@@ -439,8 +453,7 @@ public abstract class Connection {
                 break;
 
             case PLAYLIST_SEND:
-                MainActivity.getPlaylist().makePlaylist(message);
-                MainActivity.getPlaylistView().updatePlaylist();
+                MainActivity.getPlaylistView().makePlaylist(message);
                 break;
 
             case PLAYLIST_PLAYING_INDEX:
@@ -458,16 +471,25 @@ public abstract class Connection {
                 MainActivity.getPlaylistView().setPlaylistTitle(Integer.parseInt(message[1]));
                 break;
 
-//            case FILECHOOSER_SHOW:
-//                MainActivity.getInstance().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        desktopFileChooser = new DesktopFileChooser(MainActivity.getInstance(), DesktopFileChooser.makeListFromMessage(message), true, FILECHOOSER_PLAYLIST_ADD);
-//                        desktopFileChooser.showDialog();
-//                    }
-//                });
-//                break;
+            case PLAYLIST_PROPERTIES:
+                MainActivity.getPlaylistView().showPropertiesWindow(message);
+                break;
 
+            case PLAYLIST_ENABLE:
+                MainActivity.getPlaylistView().selectItem(Integer.parseInt(message[1]) - 1, Boolean.valueOf(message[2]));
+                break;
+
+            case QUEUE_SEND:
+                MainActivity.getPlaylist().setQueueFromMessage(message);
+                break;
+
+            case QUEUE_ADD:
+
+                break;
+
+            case QUEUE_REMOVE:
+
+                break;
 
             case FILECHOOSER_SHOW_PLAYLIST:
                 MainActivity.getInstance().runOnUiThread(new Runnable() {
@@ -477,6 +499,18 @@ public abstract class Connection {
                         desktopFileChooser.showDialog();
                     }
                 });
+                break;
+
+            case FILECHOOSER_PLAYLIST_ADD_ALREADYEXIST:
+                playlistAlreadyExistView.addToDialog(message[1]);
+                if (!playlistAlreadyExistView.isShowing()) {
+                    MainActivity.getInstance().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            playlistAlreadyExistView.showDialog();
+                        }
+                    });
+                }
                 break;
 
 
@@ -493,6 +527,7 @@ public abstract class Connection {
             case FILECHOOSER_DIRECTORY_TREE:
                 desktopFileChooser.setTreeItemsList(DesktopFileChooser.makeListFromMessage(message));
                 break;
+
             case FILECHOOSER_DRIVE_LIST:
                 desktopFileChooser.setTreeItemsList(DesktopFileChooser.makeListFromMessage(message));
                 break;
@@ -538,10 +573,14 @@ public abstract class Connection {
         wifiButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                popupWindow.dismiss();
-                showSearchDevicesView(0, container);
-                WifiConnection.searchDevices();
-
+                WifiConnection.checkAndDo(new Runnable() {
+                    @Override
+                    public void run() {
+                        popupWindow.dismiss();
+                        showSearchDevicesView(0, container);
+                        WifiConnection.searchDevices();
+                    }
+                });
             }
         });
 
@@ -640,7 +679,7 @@ public abstract class Connection {
         MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+                popupWindow.showAtLocation(container, Gravity.CENTER, 0, 0);
             }
         });
     }

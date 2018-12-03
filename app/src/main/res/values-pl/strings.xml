@@ -24,4 +24,38 @@
     <string name="player_nofilechoosen">Nie wybrano pliku</string>
     <string name="recent_files">Ostatnio wybierane</string>
     <string name="open">Otwórz</string>
+    <string name="yes">Tak</string>
+    <string name="playlist_already_exist">Te pliki zostały już dodane do playlisty</string>
+    <string name="playlist_already_exist_add">Chcesz dodać zaznaczone pliki?</string>
+
+
+    <string-array name="playlist_item_menu">
+        <item>Odtwórz</item>
+        <item>Właściwości</item>
+        <item>Dodaj do kolejki</item>
+        <item>Usuń z kolejki</item>
+        <item>Wyłącz/Włącz</item>
+        <item>Usuń</item>
+    </string-array>
+
+    <string name="properties">Właściwości</string>
+    <string name="prop_name">Nazwa</string>
+    <string name="prop_path">Ścieżka</string>
+    <string name="prop_artist">Wykonawca</string>
+    <string name="prop_album">Album</string>
+    <string name="prop_bitrate">Bit rate</string>
+    <string name="prop_channels">Kanał</string>
+    <string name="prop_duration">Czas trwania</string>
+    <string name="prop_framerate">Ilość klatek</string>
+    <string name="prop_height">Wysokość</string>
+    <string name="prop_samplingrate">Sampling rate</string>
+    <string name="prop_width">Szerokość</string>
+    <string name="connecting_wifi_error">Nie jesteś połączony do żadnej sieci Wi-Fi</string>
+    <string name="menu_showqueue">Pokaż kolejkę</string>
+    <string name="founded">Znalezione urządzenia</string>
+    <string name="searching_devices">Szukam urządzeń</string>
+    <string name="connecting">Łącze</string>
+    <string name="queue_clear">Wyczyść kolejkę</string>
+    <string name="queue">Kolejka</string>
+    <string name="close">Zamknij</string>
 </resources>

@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private MyViewPager mViewPager;
     private static PilotView pilotView;
     private static PlaylistView playlistView;
-    private static PreviewView previewView;
 
     private static MainActivity instance;
 
@@ -57,10 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static PlaylistView getPlaylistView() {
         return playlistView;
-    }
-
-    public static PreviewView getPreviewView() {
-        return previewView;
     }
 
     private static Playlist playlist;
@@ -96,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
         pilotView = new PilotView();
         playlistView = new PlaylistView();
-        previewView = new PreviewView();
 
         playlist = new Playlist();
     }
@@ -117,16 +111,13 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.settings:
                 return true;
+
+            case R.id.queue:
+                playlist.getQueue().showDialog();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    public void testFunc(View view) {
-        System.out.println("tak");
-//        ImageButton button = findViewById(R.id.btn_play);
-//        VectorChildFinder vectorChildFinder = new VectorChildFinder(this, R.drawable.ic_play_circle, button);
-//        vectorChildFinder.findPathByName("circle").setFillColor(Color.BLUE);
     }
 
     /**
@@ -171,9 +162,6 @@ public class MainActivity extends AppCompatActivity {
                 case 2:
                     rootView = playlistView.makeView(inflater, container);
                     break;
-
-                case 3:
-                    rootView = previewView.makeView(inflater, container);
             }
             return rootView;
         }
@@ -200,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 2;
         }
     }
 }

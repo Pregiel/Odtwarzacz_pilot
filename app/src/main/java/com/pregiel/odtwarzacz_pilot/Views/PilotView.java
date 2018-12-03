@@ -22,6 +22,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooser;
+import com.pregiel.odtwarzacz_pilot.ExpandableTimeTask;
 import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.R;
 import com.pregiel.odtwarzacz_pilot.RecentFilesAdapter;
@@ -92,6 +93,10 @@ public class PilotView {
 
     private List<String> recentFilesList;
     private RecentFilesAdapter recentFilesAdapter;
+
+
+    private ExpandableTimeTask showVolumeTask;
+    private RelativeLayout volumeLayout;
 
     @SuppressLint("ClickableViewAccessibility")
     public View makeView(LayoutInflater inflater, final ViewGroup container) {
@@ -255,6 +260,22 @@ public class PilotView {
                 Connection.sendMessage(Connection.FILECHOOSER_SHOW_OPEN);
             }
         });
+
+
+        volumeLayout = view.findViewById(R.id.volumeLayout);
+        volumeLayout.setVisibility(View.GONE);
+
+        showVolumeTask = new ExpandableTimeTask(new Runnable() {
+            @Override
+            public void run() {
+                MainActivity.getInstance().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        volumeLayout.setVisibility(View.GONE);
+                    }
+                });
+            }
+        }, 2000);
 
         return view;
     }
@@ -475,6 +496,23 @@ public class PilotView {
             @Override
             public void run() {
                 recentFilesAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public void showVolumeLabel(final String value) {
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                volumeLayout.setVisibility(View.VISIBLE);
+                TextView volumeInfo = view.findViewById(R.id.volumeInfo);
+                volumeInfo.setText(value);
+
+                if (showVolumeTask.isFinished() || !showVolumeTask.isStarted()) {
+                    showVolumeTask.start();
+                } else {
+                    showVolumeTask.expand();
+                }
             }
         });
     }

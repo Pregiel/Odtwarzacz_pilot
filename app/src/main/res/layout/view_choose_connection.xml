@@ -2,13 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="@android:color/background_light"
+        android:background="@drawable/window_border"
         android:orientation="vertical"
         android:padding="22dp">
 
@@ -20,12 +21,14 @@
             android:text="@string/connect"
             android:textAlignment="center"
             android:textSize="30sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryDark"/>
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="24dp"
             android:orientation="horizontal">
 
             <android.support.v7.widget.AppCompatImageButton
@@ -55,12 +58,14 @@
             android:text="@string/recent_connected"
             android:textAlignment="textStart"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryDark"/>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/separator" />
+            android:background="@color/separator"
+            android:backgroundTint="@color/divider"/>
 
         <ListView
             android:id="@+id/recentConnected"

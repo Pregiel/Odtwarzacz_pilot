@@ -8,4 +8,5 @@
     android:paddingStart="12dp"
     android:text="Computer"
     android:textColor="@color/primary_text"
+    android:textSize="18sp"
     android:gravity="center_vertical"/>

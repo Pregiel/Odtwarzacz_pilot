@@ -1,11 +1,17 @@
 package com.pregiel.odtwarzacz_pilot.connection;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
+import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -129,7 +135,7 @@ public class WifiConnection extends Connection {
     private static String selectedHost;
 
     public static void connect(String host) {
-        connect(host, null);
+        connect(host, MainActivity.getInstance().getApplicationContext());
     }
 
     public static void connect(String host, Context context) {
@@ -138,37 +144,43 @@ public class WifiConnection extends Connection {
         new LongOperationConnect(context).execute();
     }
 
-    public static void checkAndConnect(String host, Context context) {
+    public static void checkAndConnect(String host, Context context, Runnable errorRunnable) {
         selectedHost = host;
-        new LongOperationConnect(context, true).execute();
+        new LongOperationConnect(context, true, errorRunnable).execute();
 
     }
 
     private static class LongOperationConnect extends AsyncTask<Void, Void, Void> {
         private Context context;
         private boolean check;
+        private Toast toast;
+        private Runnable endRunnable;
 
-        public LongOperationConnect(Context context) {
+        public LongOperationConnect(@NonNull Context context) {
             this.context = context;
         }
 
-        public LongOperationConnect(Context context, boolean check) {
-            this.context = context;
+        public LongOperationConnect(@NonNull Context context, boolean check) {
+            this(context);
             this.check = check;
         }
 
+        public LongOperationConnect(@NonNull Context context, boolean check, Runnable endRunnable) {
+            this(context, check);
+            this.endRunnable = endRunnable;
+        }
+
+
         @Override
         protected Void doInBackground(Void... voids) {
-            final Toast[] toast = new Toast[1];
-            if (context != null) {
-                ((Activity) context).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        toast[0] = Toast.makeText(context, context.getString(R.string.connecting_with, selectedHost), Toast.LENGTH_LONG);
-                        toast[0].show();
-                    }
-                });
-            }
+            ((Activity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    toast = Toast.makeText(context, context.getString(R.string.connecting_with, selectedHost), Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            });
+
             try {
                 if (check) {
                     isReachableByTcp(selectedHost, TIMEOUT_CONNECTING);
@@ -199,19 +211,30 @@ public class WifiConnection extends Connection {
                 recentPrefEditor.apply();
 
             } catch (SocketTimeoutException ex) {
-                if (context != null) {
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //TODO: splash screen
-                            Toast.makeText(context, context.getString(R.string.connecting_error, selectedHost), Toast.LENGTH_SHORT).show();
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //TODO: splash screen
+                        if (toast != null) {
+                            toast.cancel();
                         }
-                    });
-                }
+                        Toast.makeText(context, context.getString(R.string.connecting_error, selectedHost), Toast.LENGTH_SHORT).show();
+
+                        if (endRunnable != null) {
+                            endRunnable.run();
+                        }
+                    }
+                });
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            toast[0].cancel();
+            if (toast != null) {
+                toast.cancel();
+            }
+            if (endRunnable != null) {
+                endRunnable.run();
+            }
             return null;
         }
     }
@@ -269,6 +292,26 @@ public class WifiConnection extends Connection {
                 e.printStackTrace();
             }
             return null;
+        }
+    }
+
+    public static void checkAndDo(Runnable runnable) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) MainActivity.getInstance().getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+        if (networkInfo.isConnected()) {
+            runnable.run();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.getInstance());
+            builder.setMessage(R.string.connecting_wifi_error)
+                    .setCancelable(false)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //do things
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
         }
     }
 

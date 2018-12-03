@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="@android:color/background_light"
+        android:background="@drawable/window_border"
         android:orientation="vertical"
         android:padding="22dp">
 
@@ -35,17 +35,17 @@
                 android:layout_weight="0"
                 android:text="@string/searching_devices"
                 android:textAlignment="center"
-                android:textSize="30sp"
-                android:textStyle="bold" />
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimaryDark"/>
         </LinearLayout>
 
 
-        <android.support.v7.widget.AppCompatImageView
+        <ProgressBar
             android:id="@+id/imageView"
             android:layout_width="match_parent"
-            android:layout_height="164dp"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/ic_looking" />
+            android:layout_height="96dp"
+            android:scaleType="fitCenter" />
 
         <TextView
             android:id="@+id/textView2"
@@ -55,12 +55,13 @@
             android:text="@string/founded"
             android:textAlignment="textStart"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryDark" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/separator" />
+            android:background="@color/separator"/>
 
         <ListView
             android:id="@+id/founded_devices"

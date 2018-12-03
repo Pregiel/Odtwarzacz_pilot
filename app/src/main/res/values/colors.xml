@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#F44336</color>
+    <color name="colorPrimary">#f44336</color>
     <color name="colorPrimaryDark">#d32f2f</color>
     <color name="colorPrimaryLight">#FFCDD2</color>
     <color name="colorAccent">#FF5252</color>
@@ -22,7 +22,7 @@
     <color name="icons_press">#e0e0e0</color>
     <color name="separator">#aaaaaa</color>
 
-    <color name="item_selected">#359eff</color>
+    <color name="item_selected">#6bb6fc</color>
 
 
 </resources>

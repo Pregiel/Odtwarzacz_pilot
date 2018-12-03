@@ -28,6 +28,11 @@ public class MyViewPager extends ViewPager {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return isSwipeEnabled() && super.onInterceptTouchEvent(ev);
+        try {
+            return isSwipeEnabled() && super.onInterceptTouchEvent(ev);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

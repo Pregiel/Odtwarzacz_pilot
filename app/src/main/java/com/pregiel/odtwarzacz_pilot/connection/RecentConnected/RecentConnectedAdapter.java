@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +21,8 @@ import com.pregiel.odtwarzacz_pilot.R;
 import com.pregiel.odtwarzacz_pilot.connection.Connection;
 import com.pregiel.odtwarzacz_pilot.connection.WifiConnection;
 
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 public class RecentConnectedAdapter extends ArrayAdapter<RecentElement> {
@@ -34,8 +37,12 @@ public class RecentConnectedAdapter extends ArrayAdapter<RecentElement> {
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         final RecentElement element = elements.get(position);
-
         convertView = LayoutInflater.from(getContext()).inflate(R.layout.element_recentconnect, parent, false);
+
+
+        final ProgressBar connectingBar = convertView.findViewById(R.id.connectingBar);
+        final ImageButton removeButton = convertView.findViewById(R.id.removeButton);
+
 
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,17 +54,34 @@ public class RecentConnectedAdapter extends ArrayAdapter<RecentElement> {
                         break;
 
                     default:
-                        WifiConnection.checkAndConnect(element.getAddress(), getContext());
-
+                        WifiConnection.checkAndDo(new Runnable() {
+                            @Override
+                            public void run() {
+                                connectingBar.setVisibility(View.VISIBLE);
+                                removeButton.setVisibility(View.GONE);
+                                WifiConnection.checkAndConnect(element.getAddress(), getContext(), new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        MainActivity.getInstance().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                connectingBar.setVisibility(View.GONE);
+                                                removeButton.setVisibility(View.VISIBLE);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
                 }
             }
         });
 
         TextView device_name = convertView.findViewById(R.id.device_name);
-        device_name.setText(element.getAddress());
+        device_name.setText(element.getName());
 
         TextView address = convertView.findViewById(R.id.address);
-        address.setText(element.getName());
+        address.setText(element.getAddress());
 
         ImageView type = convertView.findViewById(R.id.type);
 
@@ -72,7 +96,6 @@ public class RecentConnectedAdapter extends ArrayAdapter<RecentElement> {
         }
 
 
-        ImageButton removeButton = convertView.findViewById(R.id.removeButton);
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

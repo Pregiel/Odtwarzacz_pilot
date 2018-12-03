@@ -327,7 +327,6 @@
             android:layout_width="80dp"
             android:layout_height="0dp"
             android:contentDescription="@string/btn_play"
-            android:onClick="testFunc"
             app:layout_constraintBottom_toBottomOf="@+id/image_circle"
             app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintEnd_toEndOf="@+id/image_circle"
@@ -357,6 +356,41 @@
                 app:srcCompat="@drawable/ic_launcher_background" />
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/volumeLayout"
+            android:layout_width="150dp"
+            android:layout_height="100dp"
+            android:layout_marginEnd="6dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/window_border"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/volumeText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:gravity="center"
+                android:text="Volume"
+                android:textColor="@color/secondary_text"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/volumeInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/volumeText"
+                android:layout_alignParentBottom="true"
+                android:gravity="center"
+                android:text="59%"
+                android:textColor="@color/primary_text"
+                android:textSize="48sp" />
+        </RelativeLayout>
+
     </android.support.constraint.ConstraintLayout>
 
     <android.support.constraint.ConstraintLayout
@@ -364,8 +398,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@android:color/background_light"
-        android:visibility="visible">
+        android:background="@color/background"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/textView"
@@ -376,6 +410,7 @@
             android:layout_marginTop="16dp"
             android:text="@string/recent_files"
             android:textAlignment="center"
+            android:textColor="@color/colorPrimaryDark"
             android:textSize="30sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -418,7 +453,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/open"/>
+                android:text="@string/open" />
 
             <Button
                 android:id="@+id/button3"

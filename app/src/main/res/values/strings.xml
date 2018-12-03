@@ -41,7 +41,40 @@
         <item>New Zealand</item>
         <item>India</item>
     </string-array>
+
+
     <string name="player_nofilechoosen">No chosen file</string>
     <string name="recent_files">Recent files</string>
     <string name="open">Open</string>
+    <string name="yes">Yes</string>
+    <string name="playlist_already_exist">These files are already added to playlist</string>
+    <string name="playlist_already_exist_add">Do you want to add selected files?</string>
+
+
+    <string-array name="playlist_item_menu">
+        <item>Play</item>
+        <item>Properties</item>
+        <item>Add to queue</item>
+        <item>Remove from queue</item>
+        <item>Disable/Enable</item>
+        <item>Remove</item>
+    </string-array>
+
+    <string name="properties">Properties</string>
+    <string name="prop_name">Name</string>
+    <string name="prop_path">Path</string>
+    <string name="prop_artist">Artist</string>
+    <string name="prop_album">Album</string>
+    <string name="prop_bitrate">Bit rate</string>
+    <string name="prop_channels">Channels</string>
+    <string name="prop_duration">Duration</string>
+    <string name="prop_framerate">Frame rate</string>
+    <string name="prop_height">Height</string>
+    <string name="prop_samplingrate">Sampling rate</string>
+    <string name="prop_width">Width</string>
+    <string name="connecting_wifi_error">You are not connected to Wi-Fi network</string>
+    <string name="menu_showqueue">Show queue</string>
+    <string name="queue_clear">Clear queue</string>
+    <string name="queue">Queue</string>
+    <string name="close">Close</string>
 </resources>
