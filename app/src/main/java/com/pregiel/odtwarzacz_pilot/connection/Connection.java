@@ -1,14 +1,10 @@
 package com.pregiel.odtwarzacz_pilot.connection;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v7.widget.AppCompatImageButton;
@@ -16,9 +12,11 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
+import android.content.Intent;
 
 import com.pregiel.odtwarzacz_pilot.Playlist.PlaylistAlreadyExistView;
 import com.pregiel.odtwarzacz_pilot.connection.RecentConnected.RecentConnectedAdapter;
@@ -123,6 +121,9 @@ public abstract class Connection {
 
     public static final String RECENT_CONNECTION_TAG = "RECENT_CONNECTION_TAG";
 
+    public static final int MODE_WIFI = 0;
+    public static final int MODE_BT = 1;
+
     private static DataInputStream DIS;
     private static DataOutputStream DOS;
 
@@ -130,6 +131,16 @@ public abstract class Connection {
     private static boolean connected = false;
 
     private static PlaylistAlreadyExistView playlistAlreadyExistView;
+
+    private static FoundedDevicesList foundedList;
+
+    public static FoundedDevicesList getFoundedList() {
+        return foundedList;
+    }
+
+    public static void initFoundedList(int mode) {
+        foundedList = new FoundedDevicesList(mode);
+    }
 
 
     public static boolean isConnected() {
@@ -143,6 +154,27 @@ public abstract class Connection {
     public static void setStreams(InputStream inputStream, OutputStream outputStream) {
         DIS = new DataInputStream(inputStream);
         DOS = new DataOutputStream(outputStream);
+        getMessage();
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                popupWindow.dismiss();
+            }
+        });
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                playlistAlreadyExistView = new PlaylistAlreadyExistView(MainActivity.getInstance());
+            }
+        });
+//        view.setConnection();
+
+        sendMessage(DEVICE_NAME, Build.MODEL);
+    }
+
+    public static void setStreams(DataInputStream dataInputStream, DataOutputStream dataOutputStream) {
+        DIS = dataInputStream;
+        DOS = dataOutputStream;
         getMessage();
         MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override
@@ -193,15 +225,14 @@ public abstract class Connection {
     }
 
     private static byte[] img;
-    private static int length;
     private static boolean showPreview = false;
 
     public static void setShowPreview(boolean showPreview) {
         Connection.showPreview = showPreview;
     }
 
-    private static void getImage() {
-        Thread connect = new Thread(new Runnable() {
+    private static void getImage(final int length) {
+        Thread getImg = new Thread(new Runnable() {
             byte[] img_received;
 
             @Override
@@ -215,10 +246,6 @@ public abstract class Connection {
                     makeImage(img);
                     getMessage();
 
-//                    if (showPreview) {
-//                        Connection.sendMessage(Connection.SNAPSHOT_REQUEST);
-//                    }
-
                 } catch (SocketException | EOFException e) {
                     e.printStackTrace();
                     disconnect();
@@ -231,8 +258,8 @@ public abstract class Connection {
 
             }
         });
-        connect.setDaemon(true);
-        connect.start();
+        getImg.setDaemon(true);
+        getImg.start();
     }
 
     private static void makeImage(byte[] bytes) {
@@ -534,8 +561,7 @@ public abstract class Connection {
 
             case SNAPSHOT:
                 getNextMessage = false;
-                length = Integer.valueOf(message[3]);
-                getImage();
+                getImage(Integer.valueOf(message[3]));
                 if (MainActivity.getPilotView().isSendTime()) {
                     sendMessage(SNAPSHOT_REQUEST);
                 }
@@ -577,7 +603,7 @@ public abstract class Connection {
                     @Override
                     public void run() {
                         popupWindow.dismiss();
-                        showSearchDevicesView(0, container);
+                        showSearchDevicesView(MODE_WIFI, container);
                         WifiConnection.searchDevices();
                     }
                 });
@@ -589,8 +615,9 @@ public abstract class Connection {
         btButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BTConnection.searchForDevice(MainActivity.getInstance());
-                BTConnection.connect();
+                popupWindow.dismiss();
+                showSearchDevicesView(MODE_BT, container);
+                BTConnection.searchForDevice();
             }
         });
 
@@ -641,11 +668,21 @@ public abstract class Connection {
     private static ListView foundedDevices;
     private static FoundedAdapter foundedAdapter;
 
-    private static void showSearchDevicesView(final int type, final ViewGroup container) {
+    private static void showSearchDevicesView(final int mode, final ViewGroup container) {
         final LayoutInflater inflater = (LayoutInflater) MainActivity.getInstance().getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-        final View popupView = inflater.inflate(R.layout.view_searching, container, false);
+        final View popupView;
+        switch (mode) {
+            case MODE_WIFI:
+                popupView = inflater.inflate(R.layout.view_searching_wifi, container, false);
+                break;
 
-        WifiConnection.initFoundedList();
+            case MODE_BT:
+            default:
+                popupView = inflater.inflate(R.layout.view_searching_bt, container, false);
+                break;
+        }
+
+        initFoundedList(mode);
 
         popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
         popupWindow.setOutsideTouchable(false);
@@ -655,13 +692,13 @@ public abstract class Connection {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (type) {
-                    case 0:
+                switch (mode) {
+                    case MODE_WIFI:
                         WifiConnection.stopSearching();
                         break;
 
-                    case 1:
-
+                    case MODE_BT:
+                        BTConnection.stopSearching();
                         break;
                 }
                 popupWindow.dismiss();
@@ -669,9 +706,33 @@ public abstract class Connection {
             }
         });
 
+        if (mode == MODE_BT) {
+            Button btnPair = popupView.findViewById(R.id.btn_pair);
+
+            btnPair.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intentOpenBluetoothSettings = new Intent();
+                    intentOpenBluetoothSettings.setAction(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+                    MainActivity.getInstance().startActivity(intentOpenBluetoothSettings);
+
+                }
+            });
+
+
+            Button btnRefresh = popupView.findViewById(R.id.btn_refresh);
+
+            btnRefresh.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    BTConnection.searchForDevice();
+                }
+            });
+        }
+
         foundedDevices = popupView.findViewById(R.id.founded_devices);
 
-        foundedAdapter = new FoundedAdapter(popupView.getContext(), WifiConnection.getFoundedList());
+        foundedAdapter = new FoundedAdapter(popupView.getContext(), getFoundedList().getList());
 
         foundedDevices.setAdapter(foundedAdapter);
 

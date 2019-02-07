@@ -58,4 +58,9 @@
     <string name="queue_clear">Wyczyść kolejkę</string>
     <string name="queue">Kolejka</string>
     <string name="close">Zamknij</string>
+    <string name="paired_devices">Sparowane urządzenia</string>
+    <string name="bt_settings">Ustawienia Bluetooth</string>
+    <string name="refresh">Odśwież</string>
+    <string name="no_bluetooth_support">To urządzenie nie obsługuje Bluetooth</string>
+    <string name="menu_showrecent">Pokaż ostatnio wybierane</string>
 </resources>

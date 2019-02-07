@@ -39,4 +39,25 @@ public class Utils {
     public static float convertPixelsToDp(float px, Context context){
         return px / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
+
+    public static String intToIp(int value) {
+
+        return ((value >> 24 ) & 0xFF ) + "." +
+                ((value >> 16 ) & 0xFF) + "." +
+                ((value >> 8 ) & 0xFF) + "." +
+                ( value & 0xFF) ;
+    }
+
+    public static int ipToInt(String ipString) {
+        int ip = 0;
+        String[] split = ipString.split("\\.");
+
+        for (int i = 0; i < split.length; i++) {
+            String s = split[i];
+            int value = Integer.valueOf(s);
+            ip += value << (8 * (3-i));
+        }
+
+        return ip;
+    }
 }

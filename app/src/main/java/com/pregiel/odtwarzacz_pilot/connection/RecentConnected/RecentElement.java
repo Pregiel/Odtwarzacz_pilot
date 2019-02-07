@@ -14,6 +14,11 @@ public class RecentElement {
         this.connectionType = connectionType;
     }
 
+    public RecentElement(String address, int connectionType) {
+        this.address = address;
+        this.connectionType = connectionType;
+    }
+
     public String getAddress() {
         return address;
     }

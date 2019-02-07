@@ -1,16 +1,23 @@
 package com.pregiel.odtwarzacz_pilot.connection;
 
-import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.support.v4.app.ActivityCompat;
+import android.os.AsyncTask;
 
+import com.pregiel.odtwarzacz_pilot.MainActivity;
+import com.pregiel.odtwarzacz_pilot.R;
+import com.pregiel.odtwarzacz_pilot.Utils;
+import com.pregiel.odtwarzacz_pilot.connection.FoundedDevices.FoundedElement;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
@@ -22,125 +29,130 @@ import java.util.UUID;
 public class BTConnection extends Connection {
 
 
-    private final static UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private final static UUID MY_UUID = UUID.fromString("b6324e17-d602-4765-822a-e68be2112efd");
     private final static int REQUEST_ENABLE_BT = 1;
 
-    private static BluetoothDevice dev;
     private static BluetoothSocket socket;
 
-    private static BluetoothAdapter mBluetoothAdapter;
-    private static SingBroadcastReceiver mReceiver;
+    private static BluetoothAdapter bluetoothAdapter;
 
     public BTConnection() {
 
     }
 
-    //search device
-    public static void searchForDevice(Activity activity) {
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (mBluetoothAdapter == null) {
-            System.out.println("Device doesn't support Bluetooth");
-        } else {
-            if (!mBluetoothAdapter.isEnabled()) {
+    public static void stopSearching() {
+
+    }
+
+    public static void searchForDevice() {
+
+        getFoundedList().clear();
+        Connection.setFoundedDevicesAdapter();
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter != null) {
+            if (!bluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+                MainActivity.getInstance().startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             }
 
-            if (mBluetoothAdapter.isEnabled()) {
-                Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+            if (bluetoothAdapter.isEnabled()) {
+                Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
 
                 if (pairedDevices.size() > 0) {
-                    // There are paired devices. Get the name and address of each paired device.
+
                     for (BluetoothDevice device : pairedDevices) {
                         String deviceName = device.getName();
-                        String deviceHardwareAddress = device.getAddress(); // MAC address
+                        String deviceHardwareAddress = device.getAddress();
                         System.out.println(deviceName);
-//                        TextView connectedDevice = findViewById(R.id.connected_device);
-//                        connectedDevice.setText(deviceName);
-                        dev = device;
+
+                        if (!getFoundedList().addressInList(deviceHardwareAddress)) {
+                            getFoundedList().add(deviceHardwareAddress, deviceName);
+                            Connection.setFoundedDevicesAdapter();
+                        }
                     }
-                } else {
-//                    Intent discoverableIntent =
-//                            new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-//                    discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-//                    startActivity(discoverableIntent);
-
-                    if (mBluetoothAdapter.isDiscovering()) {
-                        System.out.println("juz szukalem urzadzen");
-                        mBluetoothAdapter.cancelDiscovery();
-                    }
-                    int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 1;
-                    ActivityCompat.requestPermissions(activity,
-                            new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                            MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
-                    mBluetoothAdapter.startDiscovery();
-
-                    mReceiver = new SingBroadcastReceiver();
-                    dev = mReceiver.getDevice();
-//                    TextView connectedDevice = findViewById(R.id.connected_device);
-//                    connectedDevice.setText(dev.getName());
-                    IntentFilter ifilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-                    activity.registerReceiver(mReceiver, ifilter);
-
-
                 }
             }
+        } else {
+            MainActivity.getInstance().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.getInstance());
+                    builder.setMessage(R.string.no_bluetooth_support)
+                            .setCancelable(false)
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //do things
+                                }
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+            });
         }
     }
 
-    private static class SingBroadcastReceiver extends BroadcastReceiver {
+    private static boolean connecting;
 
-        private BluetoothDevice device;
-
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-//            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-            // Discovery has found a device. Get the BluetoothDevice
-            // object and its info from the Intent.
-            device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            String deviceName = device.getName();
-            String deviceHardwareAddress = device.getAddress(); // MAC address
-            System.out.println(deviceHardwareAddress);
-//            }
-        }
-
-        public BluetoothDevice getDevice() {
-            return device;
-        }
+    public static void connect(FoundedElement element) {
+        if (!connecting)
+            new LongOperationConnect(element).execute();
     }
 
-    //searchDevices
+    private static class LongOperationConnect extends AsyncTask<Void, Void, Void> {
+        FoundedElement element;
 
+        public LongOperationConnect(FoundedElement element) {
+            this.element = element;
+        }
 
-    public static void connect() {
-//        String address = "00:15:83:07:D5:DA";
-        if (mBluetoothAdapter.isEnabled()) {
-            try {
-                BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(dev.getAddress());
-                socket = device.createRfcommSocketToServiceRecord(MY_UUID);
-            } catch (IOException e) {
-                System.out.println("In onResume() and socket create failed: " + e.getMessage() + ".");
-            }
-
-            mBluetoothAdapter.cancelDiscovery();
-
-            try {
-                socket.connect();
-                System.out.println("\n...Connection established and data link opened...");
-
-                setConnected(true);
-                setStreams( socket.getInputStream(), socket.getOutputStream());
-            } catch (IOException e) {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            connecting = true;
+            if (bluetoothAdapter.isEnabled()) {
                 try {
-                    socket.close();
-                } catch (IOException e2) {
-                    System.out.println("In onResume() and unable to close socket during connection failure" + e2.getMessage() + ".");
+                    BluetoothDevice device = bluetoothAdapter.getRemoteDevice(element.getAddress());
+                    socket = device.createRfcommSocketToServiceRecord(MY_UUID);
+
+                    socket.connect();
+                    System.out.println("Connected with " + element.getName());
+
+                    DataInputStream DIS = new DataInputStream(
+                            socket.getInputStream());
+                    DataOutputStream DOS = new DataOutputStream(
+                            socket.getOutputStream());
+
+
+                    setConnected(true);
+                    setStreams(DIS, DOS);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    connecting = false;
+                    try {
+                        socket.close();
+                        MainActivity.getInstance().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.getInstance());
+                                builder.setMessage(MainActivity.getInstance().getString(R.string.connecting_error, element.getName()))
+                                        .setCancelable(false)
+                                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                //do things
+                                            }
+                                        });
+                                AlertDialog alert = builder.create();
+                                alert.show();
+                            }
+                        });
+                    } catch (IOException e2) {
+                        e2.printStackTrace();
+                        connecting = false;
+                    }
                 }
             }
-
-
+            connecting = false;
+            return null;
         }
     }
-
 
 }

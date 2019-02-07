@@ -229,12 +229,14 @@ public class PilotView {
         });
 
 
+        final ConstraintLayout recentWindow = view.findViewById(R.id.recent_files_window);
+
         ImageButton menuButton = view.findViewById(R.id.btn_menu);
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ConstraintLayout recentWindow = view.findViewById(R.id.recent_files_window);
-                recentWindow.setVisibility(recentWindow.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+//                recentWindow.setVisibility(recentWindow.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+                MainActivity.getInstance().getmViewPager().setCurrentItem(1);
             }
         });
 
@@ -258,6 +260,15 @@ public class PilotView {
             @Override
             public void onClick(View v) {
                 Connection.sendMessage(Connection.FILECHOOSER_SHOW_OPEN);
+            }
+        });
+
+
+        Button closeRecentButton = view.findViewById(R.id.btn_close_recent);
+        closeRecentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recentWindow.setVisibility(View.GONE);
             }
         });
 

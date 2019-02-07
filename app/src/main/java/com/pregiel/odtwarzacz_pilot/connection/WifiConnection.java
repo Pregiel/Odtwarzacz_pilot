@@ -6,31 +6,30 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
 import android.net.NetworkInfo;
-import android.net.nsd.NsdManager;
-import android.net.nsd.NsdServiceInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
-import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.pregiel.odtwarzacz_pilot.MainActivity;
 import com.pregiel.odtwarzacz_pilot.R;
+import com.pregiel.odtwarzacz_pilot.Utils;
+import com.pregiel.odtwarzacz_pilot.connection.FoundedDevices.FoundedElement;
+import com.pregiel.odtwarzacz_pilot.connection.RecentConnected.RecentElement;
 
-import org.xbill.DNS.Address;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -44,6 +43,9 @@ public class WifiConnection extends Connection {
     private static Socket socket;
 
     private final static int PORT = 1755;
+    private final static String SEARCHING = "SEARCHING";
+    private final static String CONNECTING = "CONNECTING";
+
     public final static int TIMEOUT_REACHABLE = 200;
     public final static int TIMEOUT_CONNECTING = 3500;
 
@@ -71,66 +73,57 @@ public class WifiConnection extends Connection {
         stopSearching = true;
     }
 
-    private static List<String> founded;
-
-    public static List<String> getFoundedList() {
-        return founded;
-    }
-
-    public static void initFoundedList() {
-        founded = new ArrayList<>();
-    }
-
-    public static void setFoundedList(List<String> founded) {
-        WifiConnection.founded = founded;
-    }
 
     private static class LongOperationSearch extends AsyncTask<Void, Void, Void> {
 
 
         @Override
         protected Void doInBackground(Void... voids) {
-            String ip = getWifiApIpAddress();
+            String ip = getWifiIpAddress();
+
+            WifiManager wifiManager = (WifiManager) MainActivity.getInstance().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
+
+            int ipInt = Utils.ipToInt(ip);
+            int netMask = dhcpInfo.netmask;
+
+            int zeros = 32 - (Integer.toBinaryString(netMask) + "0").indexOf("0");
+
+            int maxHosts = (int) Math.pow(2, zeros);
+
+            int ipAddressSpace = (ipInt & (netMask << zeros));
+
             stopSearching = false;
-
-            System.out.println("My ip: " + ip);
-
-            String subnet = ip.substring(0, ip.lastIndexOf(".") + 1);
-
             selectedHost = null;
+
             while (!stopSearching) {
-                for (int i = 1; i < 255; i++) {
-                    String host = subnet + i;
-                    if (isReachableByTcp(host)) {
-                        if (!founded.contains(host)) {
-                            founded.add(host);
+                int i = 0;
+                while (i < maxHosts) {
+                    String host = Utils.intToIp(ipAddressSpace + i);
+                    String hostName = isReachableByTcp(host);
+
+                    if (hostName != null) {
+                        if (!getFoundedList().addressInList(host)) {
+                            getFoundedList().add(host, hostName);
                             Connection.setFoundedDevicesAdapter();
                         }
-                        System.out.println("founded: " + host);
-                        break;
                     } else {
-                        if (founded.contains(host)) {
-                            founded.remove(host);
-                            Connection.setFoundedDevicesAdapter();
-                        }
+                        getFoundedList().removeIfInList(host);
+                        Connection.setFoundedDevicesAdapter();
                     }
+
                     if (stopSearching || selectedHost != null) {
                         break;
                     }
+
+                    i++;
                 }
             }
-//            if (selectedHost != null) {
-//                try {
-//                    socket = new Socket(selectedHost, 1755);
-//                    setConnected(true);
-//                    setStreams(socket.getInputStream(), socket.getOutputStream());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
+            getFoundedList().clear();
             return null;
         }
     }
+
 
     private static String selectedHost;
 
@@ -190,8 +183,13 @@ public class WifiConnection extends Connection {
                 SocketAddress socketAddress = new InetSocketAddress(selectedHost, PORT);
                 socket.connect(socketAddress, TIMEOUT_CONNECTING);
 
+
+                DataInputStream DIS = new DataInputStream(socket.getInputStream());
+                DataOutputStream DOS = new DataOutputStream(socket.getOutputStream());
+                DOS.writeUTF(CONNECTING);
+
                 setConnected(true);
-                setStreams(socket.getInputStream(), socket.getOutputStream());
+                setStreams(DIS, DOS);
 
 
                 SharedPreferences recentPref = MainActivity.getInstance().getBaseContext().getSharedPreferences(RECENT_CONNECTION_TAG, Context.MODE_PRIVATE);
@@ -239,34 +237,45 @@ public class WifiConnection extends Connection {
         }
     }
 
-    public static boolean isReachableByTcp(String host) {
+    public static String isReachableByTcp(String host) {
         return isReachableByTcp(host, TIMEOUT_REACHABLE);
     }
 
-    public static boolean isReachableByTcp(String host, int timeout) {
+    public static String isReachableByTcp(String host, int timeout) {
         try {
             Socket socket = new Socket();
             SocketAddress socketAddress = new InetSocketAddress(host, PORT);
             socket.connect(socketAddress, timeout);
+
+            DataOutputStream DOS = new DataOutputStream(socket.getOutputStream());
+            DataInputStream DIS = new DataInputStream(socket.getInputStream());
+
+            DOS.writeUTF(SEARCHING);
+            String msg = DIS.readUTF();
+
+            DIS.close();
+            DOS.close();
             socket.close();
-            return true;
+            return msg;
         } catch (IOException e) {
-            return false;
+            return null;
         }
     }
 
-    private static String getWifiApIpAddress() {
-
+    private static String getWifiIpAddress() {
         try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en
-                    .hasMoreElements(); ) {
-                NetworkInterface intf = en.nextElement();
-                if (intf.getName().contains("wlan")) {
-                    for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr
-                            .hasMoreElements(); ) {
-                        InetAddress inetAddress = enumIpAddr.nextElement();
-                        if (!inetAddress.isLoopbackAddress()
-                                && (inetAddress.getAddress().length == 4)) {
+            for (Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements(); ) {
+
+                NetworkInterface networkInterface = interfaces.nextElement();
+
+                if (networkInterface.getName().contains("wlan")) {
+
+
+                    for (Enumeration<InetAddress> addresses = networkInterface.getInetAddresses(); addresses.hasMoreElements(); ) {
+                        InetAddress inetAddress = addresses.nextElement();
+
+
+                        if (!inetAddress.isLoopbackAddress() && (inetAddress.getAddress().length == 4)) {
                             return inetAddress.getHostAddress();
                         }
                     }

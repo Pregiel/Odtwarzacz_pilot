@@ -77,4 +77,9 @@
     <string name="queue_clear">Clear queue</string>
     <string name="queue">Queue</string>
     <string name="close">Close</string>
+    <string name="paired_devices">Paired devices</string>
+    <string name="bt_settings">Bluetooth settings</string>
+    <string name="refresh">Refresh</string>
+    <string name="no_bluetooth_support">This device don\'t support Bluetooth</string>
+    <string name="menu_showrecent">Show recent files</string>
 </resources>

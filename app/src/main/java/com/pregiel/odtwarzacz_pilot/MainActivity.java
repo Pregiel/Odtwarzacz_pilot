@@ -1,5 +1,6 @@
 package com.pregiel.odtwarzacz_pilot;
 
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -110,6 +111,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.settings:
+                return true;
+
+            case R.id.recent:
+                final ConstraintLayout recentWindow = pilotView.getView().findViewById(R.id.recent_files_window);
+                recentWindow.setVisibility(View.VISIBLE);
                 return true;
 
             case R.id.queue:
