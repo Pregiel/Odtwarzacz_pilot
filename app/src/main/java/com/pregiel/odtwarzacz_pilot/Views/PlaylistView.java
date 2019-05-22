@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.pregiel.odtwarzacz_pilot.DesktopFileChooser.DesktopFileChooser;
 import com.pregiel.odtwarzacz_pilot.MainActivity;
@@ -31,6 +32,7 @@ public class PlaylistView {
     private View view;
     private PlaylistListViewAdapter playlistAdapter;
     private ArrayAdapter<String> playlistTitlesAdapter;
+    private ListView playlistList;
 
     public View getView() {
         return view;
@@ -49,7 +51,7 @@ public class PlaylistView {
         playlistTitles.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Connection.sendMessage(Connection.PLAYLIST_TITLE_INDEX, position);
+                    Connection.sendMessage(Connection.PLAYLIST_TITLE_INDEX, position);
             }
 
             @Override
@@ -62,8 +64,8 @@ public class PlaylistView {
 
         playlistAdapter = new PlaylistListViewAdapter(view.getContext(), MainActivity.getPlaylist().getPlaylist());
 
-        ListView listView = view.findViewById(R.id.listview);
-        listView.setAdapter(playlistAdapter);
+        playlistList = view.findViewById(R.id.listview);
+        playlistList.setAdapter(playlistAdapter);
 
         FloatingActionButton floatingActionButton = view.findViewById(R.id.floatingActionButton);
 
@@ -107,7 +109,6 @@ public class PlaylistView {
 
     public void setPlaylistTitle(final int index) {
         final Spinner playlistTitles = view.findViewById(R.id.selected_playlist);
-
 
         ((Activity) view.getContext()).runOnUiThread(new Runnable() {
             @Override

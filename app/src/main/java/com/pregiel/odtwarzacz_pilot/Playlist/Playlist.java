@@ -64,4 +64,8 @@ public class Playlist {
 
         queue.updatePlaylistView();
     }
+
+    public void setNoPlaying() {
+
+    }
 }

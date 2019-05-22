@@ -61,10 +61,6 @@ public class WifiConnection extends Connection {
         new LongOperationSearch().execute();
     }
 
-    public void disconnect() {
-        new LongOperationDisconnect().execute();
-    }
-
     //connection
 
     private static boolean stopSearching;
@@ -79,29 +75,28 @@ public class WifiConnection extends Connection {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            String ip = getWifiIpAddress();
-
             WifiManager wifiManager = (WifiManager) MainActivity.getInstance().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            DhcpInfo dhcpInfo = wifiManager.getDhcpInfo();
 
-            int ipInt = Utils.ipToInt(ip);
-            int netMask = dhcpInfo.netmask;
+            int ipInt = wifiManager.getConnectionInfo().getIpAddress();
+            int netMask = wifiManager.getDhcpInfo().netmask;
 
-            int zeros = 32 - (Integer.toBinaryString(netMask) + "0").indexOf("0");
-
+            int ones = Integer.toBinaryString(netMask).length();
+            int zeros = 32 - ones;
             int maxHosts = (int) Math.pow(2, zeros);
 
-            int ipAddressSpace = (ipInt & (netMask << zeros));
+            int ipAddressSpace = Integer.reverseBytes(ipInt & netMask);
 
             stopSearching = false;
             selectedHost = null;
 
-            while (!stopSearching) {
-                int i = 0;
-                while (i < maxHosts) {
+            while (!stopSearching && selectedHost == null) {
+                for (int i = 0; i < maxHosts; i++) {
                     String host = Utils.intToIp(ipAddressSpace + i);
                     String hostName = isReachableByTcp(host);
 
+                    if (i == 2) {
+                        System.out.println(host);
+                    }
                     if (hostName != null) {
                         if (!getFoundedList().addressInList(host)) {
                             getFoundedList().add(host, hostName);
@@ -115,8 +110,6 @@ public class WifiConnection extends Connection {
                     if (stopSearching || selectedHost != null) {
                         break;
                     }
-
-                    i++;
                 }
             }
             getFoundedList().clear();
@@ -258,48 +251,6 @@ public class WifiConnection extends Connection {
             socket.close();
             return msg;
         } catch (IOException e) {
-            return null;
-        }
-    }
-
-    private static String getWifiIpAddress() {
-        try {
-            for (Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces(); interfaces.hasMoreElements(); ) {
-
-                NetworkInterface networkInterface = interfaces.nextElement();
-
-                if (networkInterface.getName().contains("wlan")) {
-
-
-                    for (Enumeration<InetAddress> addresses = networkInterface.getInetAddresses(); addresses.hasMoreElements(); ) {
-                        InetAddress inetAddress = addresses.nextElement();
-
-
-                        if (!inetAddress.isLoopbackAddress() && (inetAddress.getAddress().length == 4)) {
-                            return inetAddress.getHostAddress();
-                        }
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    // disconnect
-
-    private class LongOperationDisconnect extends AsyncTask<Void, Void, Void> {
-
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             return null;
         }
     }

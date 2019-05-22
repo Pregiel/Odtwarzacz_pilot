@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center">
+
+    <TextView
+        android:id="@+id/txt_already"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:paddingBottom="16dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="16dp"
+        android:text="@string/playlist_already_exist"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="26sp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_alignBottom="@+id/txt_already"
+        android:background="@color/colorAccent" />
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignBottom="@+id/divider2"
+        android:layout_alignTop="@+id/divider" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_alignTop="@+id/buttons"
+        android:background="@color/colorAccent" />
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txt_already2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/buttons"
+            android:layout_marginBottom="6dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="@string/playlist_already_exist_add"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="26sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_alignParentBottom="false"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@android:string/cancel"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/btn_yes"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/yes"
+                android:textSize="20sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
+

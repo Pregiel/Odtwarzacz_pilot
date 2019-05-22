@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="12dp">
+
+    <TextView
+        android:id="@+id/txt_prop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:paddingBottom="16dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="16dp"
+        android:text="@string/properties"
+        android:textColor="@color/colorAccent"
+        android:textSize="28sp" />
+
+    <View
+        android:id="@+id/divider3"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_alignBottom="@+id/txt_prop"
+        android:background="@color/colorAccent" />
+
+    <ListView
+        android:id="@+id/propListview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/propButton"
+        android:layout_below="@+id/divider3"
+        android:paddingEnd="4dp"
+        android:paddingStart="4dp" />
+
+    <Button
+        android:id="@+id/propButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:text="@android:string/ok"
+        android:textSize="20sp" />
+</RelativeLayout>

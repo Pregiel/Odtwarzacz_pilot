@@ -22,6 +22,7 @@ import com.pregiel.odtwarzacz_pilot.Views.PageListener;
 import com.pregiel.odtwarzacz_pilot.Views.PilotView;
 import com.pregiel.odtwarzacz_pilot.Views.PlaylistView;
 import com.pregiel.odtwarzacz_pilot.Views.PreviewView;
+import com.pregiel.odtwarzacz_pilot.connection.Connection;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -110,16 +111,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.settings:
-                return true;
-
             case R.id.recent:
                 final ConstraintLayout recentWindow = pilotView.getView().findViewById(R.id.recent_files_window);
                 recentWindow.setVisibility(View.VISIBLE);
+                mViewPager.setCurrentItem(0);
                 return true;
 
             case R.id.queue:
                 playlist.getQueue().showDialog();
+                return true;
+
+            case R.id.disconnect:
+                Connection.disconnect();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

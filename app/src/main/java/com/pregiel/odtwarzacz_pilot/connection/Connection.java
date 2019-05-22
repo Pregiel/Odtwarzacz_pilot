@@ -288,7 +288,7 @@ public abstract class Connection {
         Connection.serverSocket = serverSocket;
     }
 
-    private static void disconnect() {
+    public static void disconnect() {
         setConnected(false);
         if (MainActivity.getPilotView().getTimer() != null) {
             MainActivity.getPilotView().getTimer().cancel();
@@ -427,6 +427,7 @@ public abstract class Connection {
                         MainActivity.getPilotView().getLblAuthor().setText(message.length > 2 ? message[2] : "");
 
                         MainActivity.getPilotView().noChosenFile(false);
+
                     }
                 });
                 break;

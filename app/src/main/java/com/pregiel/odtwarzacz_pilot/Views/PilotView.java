@@ -430,7 +430,9 @@ public class PilotView {
             default:
 //                playButton.setImageDrawable(ContextCompat.getDrawable(MainActivity.getInstance().getApplicationContext(), R.drawable.ic_play_circle));
                 playButton.setImageResource(R.drawable.ic_play_circle);
-                timer.cancel();
+                if (timer != null) {
+                    timer.cancel();
+                }
                 playing = false;
         }
     }

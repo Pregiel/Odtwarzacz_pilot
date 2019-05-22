@@ -21,7 +21,7 @@
     <string name="btn_prev" >Previous</string>
     <string name="btn_play">Play/pause</string>
     <string name="btn_next_randomize">Randomize next file</string>
-    <string name="img_background_circle" />
+    <string name="img_background_circle">circle</string>
     <string name="internet" translatable="false">Internet</string>
     <string name="usb" translatable="false">USB</string>
     <string name="recent_connected">Recent connected</string>
@@ -30,17 +30,6 @@
     <string name="searching_devices">Searching devices</string>
     <string name="connecting_with">Connecting with %1$s</string>
     <string name="connecting_error">Can\'t connect to %1$s</string>
-
-    <string-array name="country_arrays">
-        <item>Malaysia</item>
-        <item>United States</item>
-        <item>Indonesia</item>
-        <item>France</item>
-        <item>Italy</item>
-        <item>Singapore</item>
-        <item>New Zealand</item>
-        <item>India</item>
-    </string-array>
 
 
     <string name="player_nofilechoosen">No chosen file</string>
@@ -82,4 +71,5 @@
     <string name="refresh">Refresh</string>
     <string name="no_bluetooth_support">This device don\'t support Bluetooth</string>
     <string name="menu_showrecent">Show recent files</string>
+    <string name="disconnect">Disconnect</string>
 </resources>

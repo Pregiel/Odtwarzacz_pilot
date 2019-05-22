@@ -12,10 +12,11 @@
 
         <ImageButton
             android:id="@+id/btn_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_width="48dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="96dp"
             android:contentDescription="@string/btn_showplaylist"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@+id/btn_mute"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -24,8 +25,9 @@
 
         <ImageButton
             android:id="@+id/btn_mute"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
             android:layout_marginTop="8dp"
             android:adjustViewBounds="true"
             android:contentDescription="@string/btn_mute"
@@ -39,8 +41,9 @@
 
         <ImageButton
             android:id="@+id/btn_repeat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
             android:layout_marginTop="8dp"
             android:adjustViewBounds="true"
             android:contentDescription="@string/btn_repeat"
@@ -54,8 +57,9 @@
 
         <ImageButton
             android:id="@+id/btn_random"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
             android:layout_marginTop="8dp"
             android:adjustViewBounds="true"
             android:contentDescription="@string/btn_random"
@@ -72,10 +76,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_above="@+id/nextBar"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="38dp"
             android:orientation="vertical"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             app:layout_constraintBottom_toTopOf="@+id/nextBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -87,13 +91,14 @@
                 android:text="@string/player_nofilechoosen"
                 android:textAlignment="center"
                 android:textColor="@color/primary_text"
-                android:textSize="18sp" />
+                android:textSize="22sp" />
 
             <TextView
                 android:id="@+id/lbl_author"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:textSize="18sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -107,7 +112,7 @@
                     android:layout_weight="1"
                     android:text="00:25"
                     android:textAlignment="textStart"
-                    android:textSize="12sp" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/lbl_time_total"
@@ -116,7 +121,7 @@
                     android:layout_weight="1"
                     android:text="03:24"
                     android:textAlignment="textEnd"
-                    android:textSize="12sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <SeekBar
@@ -133,7 +138,7 @@
             android:layout_alignParentBottom="true"
             android:background="@color/colorPrimaryDark"
             android:orientation="vertical"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -144,12 +149,12 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:paddingBottom="3dp"
-                android:paddingLeft="5dp"
+                android:paddingLeft="10dp"
                 android:paddingRight="5dp"
                 android:paddingTop="3dp"
                 android:text="Next"
                 android:textColor="@color/text_light"
-                android:textSize="12sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -158,7 +163,7 @@
                 android:background="@color/colorPrimary"
                 android:orientation="horizontal"
                 android:paddingBottom="5dp"
-                android:paddingLeft="5dp"
+                android:paddingLeft="10dp"
                 android:paddingRight="5dp"
                 android:paddingTop="5dp">
 
@@ -172,16 +177,21 @@
                         android:id="@+id/lbl_next_filename"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="4dp"
+                        android:paddingTop="4dp"
                         android:text="File name"
                         android:textColor="@color/text_light"
+                        android:textSize="20sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/lbl_next_author"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:paddingBottom="6dp"
                         android:text="Author"
-                        android:textColor="@color/text_light" />
+                        android:textColor="@color/text_light"
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <ImageButton
@@ -202,7 +212,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/infoBar"
-            app:layout_constraintDimensionRatio="12:9"
+            app:layout_constraintDimensionRatio="11:6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_menu">
@@ -253,6 +263,7 @@
                 android:id="@+id/circle_vol_down"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
                 android:contentDescription="@string/img_background_circle"
                 android:tint="@color/icons_press"
                 android:visibility="invisible"
@@ -261,9 +272,9 @@
 
         <ImageButton
             android:id="@+id/btn_vol_down"
-            android:layout_width="46dp"
+            android:layout_width="72dp"
             android:layout_height="0dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="24dp"
             android:contentDescription="@string/btn_volume_down"
             android:tint="@color/colorPrimary"
             app:layout_constraintDimensionRatio="h,1:1"
@@ -274,9 +285,9 @@
 
         <ImageButton
             android:id="@+id/btn_vol_up"
-            android:layout_width="46dp"
+            android:layout_width="72dp"
             android:layout_height="0dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="24dp"
             android:contentDescription="@string/btn_vol_up"
             android:tint="@color/colorPrimary"
             app:layout_constraintBottom_toTopOf="@+id/btn_play"
@@ -287,9 +298,9 @@
 
         <ImageButton
             android:id="@+id/btn_prev"
-            android:layout_width="46dp"
+            android:layout_width="72dp"
             android:layout_height="0dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="24dp"
             android:contentDescription="@string/btn_prev"
             android:tint="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="@+id/btn_play"
@@ -300,9 +311,9 @@
 
         <ImageButton
             android:id="@+id/btn_next"
-            android:layout_width="46dp"
+            android:layout_width="72dp"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="24dp"
             android:contentDescription="@string/btn_next"
             android:tint="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="@+id/btn_play"
@@ -313,7 +324,7 @@
 
         <ImageButton
             android:id="@+id/btn_play"
-            android:layout_width="80dp"
+            android:layout_width="120dp"
             android:layout_height="0dp"
             android:contentDescription="@string/btn_play"
             app:layout_constraintBottom_toBottomOf="@+id/layout_circle"
@@ -346,8 +357,8 @@
 
         <RelativeLayout
             android:id="@+id/volumeLayout"
-            android:layout_width="150dp"
-            android:layout_height="100dp"
+            android:layout_width="170dp"
+            android:layout_height="140dp"
             android:layout_marginEnd="6dp"
             android:layout_marginStart="6dp"
             android:layout_marginTop="12dp"
@@ -365,7 +376,7 @@
                 android:gravity="center"
                 android:text="Volume"
                 android:textColor="@color/secondary_text"
-                android:textSize="16sp" />
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/volumeInfo"
@@ -376,7 +387,7 @@
                 android:gravity="center"
                 android:text="59%"
                 android:textColor="@color/primary_text"
-                android:textSize="48sp" />
+                android:textSize="64sp" />
         </RelativeLayout>
 
     </android.support.constraint.ConstraintLayout>
@@ -400,7 +411,7 @@
             android:text="@string/recent_files"
             android:textAlignment="center"
             android:textColor="@color/colorPrimaryDark"
-            android:textSize="30sp"
+            android:textSize="36sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -442,7 +453,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/open" />
+                android:text="@string/open"
+                android:textSize="18sp" />
 
             <Button
                 android:id="@+id/btn_close_recent"
@@ -450,7 +462,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:text="@string/close" />
+                android:text="@string/close"
+                android:textSize="18sp" />
         </LinearLayout>
     </android.support.constraint.ConstraintLayout>
 </FrameLayout>

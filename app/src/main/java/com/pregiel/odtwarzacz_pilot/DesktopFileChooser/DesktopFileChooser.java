@@ -141,6 +141,9 @@ public class DesktopFileChooser {
                     } else {
                         if (!multiSelect) {
                             selectedItemsList.clear();
+                            for (int j = 0; j < adapterView.getCount(); j++) {
+                                adapterView.getChildAt(j).setBackgroundColor(view.getResources().getColor(R.color.background));
+                            }
                         }
                         selectedItemsList.add(item.getPath());
                         adapterView.getChildAt(i).setBackgroundColor(view.getResources().getColor(R.color.item_selected));

@@ -63,4 +63,6 @@
     <string name="refresh">Odśwież</string>
     <string name="no_bluetooth_support">To urządzenie nie obsługuje Bluetooth</string>
     <string name="menu_showrecent">Pokaż ostatnio wybierane</string>
+    <string name="disconnect">Rozłącz</string>
+    <string name="img_background_circle">circle</string>
 </resources>
